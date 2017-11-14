@@ -17,4 +17,8 @@ public class Error {
     public static void syntaxError() {
         System.out.println("Error: syntax error.");
     }
+    
+    public static void noPrimaryKeyError() {
+        System.out.println("Error: no primary key declared.");
+    }
 }
