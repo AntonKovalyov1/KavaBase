@@ -30,6 +30,11 @@ public enum SerialType {
         public byte getContentSize() {
             return 1;
         }
+
+        @Override
+        public String toString() {
+            return "NULL_1";
+        }
     },
     NULL_2 {
         @Override
@@ -40,6 +45,11 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 2;
+        }
+
+        @Override
+        public String toString() {
+            return "NULL_2";
         }
     },
     NULL_4 {
@@ -52,6 +62,11 @@ public enum SerialType {
         public byte getContentSize() {
             return 4;
         }
+
+        @Override
+        public String toString() {
+            return "NULL_4";
+        }
     },
     NULL_8 {
         @Override
@@ -62,6 +77,11 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 8;
+        }
+
+        @Override
+        public String toString() {
+            return "NULL_8";
         }
     },
     TINYINT {
@@ -74,6 +94,11 @@ public enum SerialType {
         public byte getContentSize() {
             return 1;
         }
+        
+        @Override
+        public String toString() {
+            return "TINYINT";
+        }
     },
     SMALLINT {
         @Override
@@ -84,6 +109,10 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 2;
+        }
+        @Override
+        public String toString() {
+            return "SMALLINT";
         }
     },
     INT {
@@ -96,6 +125,10 @@ public enum SerialType {
         public byte getContentSize() {
             return 4;
         }
+        @Override
+        public String toString() {
+            return "INT";
+        }
     },
     BIGINT {
         @Override
@@ -106,6 +139,11 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 8;
+        }
+        
+        @Override
+        public String toString() {
+            return "BIGINT";
         }
     },
     REAL {
@@ -118,6 +156,11 @@ public enum SerialType {
         public byte getContentSize() {
             return 4;
         }
+        
+        @Override
+        public String toString() {
+            return "REAL";
+        }
     },
     DOUBLE {
         @Override
@@ -128,6 +171,11 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 8;
+        }
+        
+        @Override
+        public String toString() {
+            return "DOUBLE";
         }
     },
     DATETIME {
@@ -140,6 +188,11 @@ public enum SerialType {
         public byte getContentSize() {
             return 8;
         }
+        
+        @Override
+        public String toString() {
+            return "DATETIME";
+        }
     },
     DATE {
         @Override
@@ -150,6 +203,11 @@ public enum SerialType {
         @Override
         public byte getContentSize() {
             return 8;
+        }
+        
+        @Override
+        public String toString() {
+            return "DATE";
         }
     },
     TEXT {
@@ -162,8 +220,15 @@ public enum SerialType {
         public byte getContentSize() {
             return 1;
         }
+        
+        @Override
+        public String toString() {
+            return "TEXT";
+        }
     };
     
     public abstract byte getCode();
     public abstract byte getContentSize();
+    @Override
+    public abstract String toString();
 }

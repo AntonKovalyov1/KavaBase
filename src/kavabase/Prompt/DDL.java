@@ -2,7 +2,6 @@ package kavabase.Prompt;
 
 import java.io.File;
 import kavabase.DataFormat.DataType;
-import kavabase.fileFormat.Column;
 import kavabase.fileFormat.Helper;
 
 /**
@@ -37,7 +36,7 @@ public class DDL {
             return false;
         }
         
-        Table table = new Table(tableName);
+        TableMetaData table = new TableMetaData(tableName);
         query = query.substring(tableName.length()).trim();
         if (!(query.startsWith("(") && query.endsWith(")"))) {
             Error.syntaxError();
@@ -59,7 +58,7 @@ public class DDL {
         }
         
         for (int i = 1; i < columns.length; i++) {
-            if (!isNonPrimaryKeyColumnValid(columns[i], table, i)) {
+            if (!isNonPrimaryKeyColumnValid(columns[i], table, (byte)i)) {
                 Error.columnDefinitionError();
                 return false;
             }
@@ -86,7 +85,7 @@ public class DDL {
         return query;
     }
     
-    private static boolean isPrimaryKeyColumnValid(String primaryKeyColumn, Table table) {
+    private static boolean isPrimaryKeyColumnValid(String primaryKeyColumn, TableMetaData table) {
         String[] tokens = primaryKeyColumn.trim().split("\\s+");
         if (tokens.length != 4)
             return false;
@@ -94,26 +93,38 @@ public class DDL {
                tokens[1].equals("int") &&
                tokens[2].equals("primary") &&
                tokens[3].equals("key")) {
-            Column column = new Column(tokens[0], true, false, 1, new DataType.Int());
+            Column column = new Column(table.getTableName(), 
+                                       tokens[0], 
+                                       "INT", 
+                                       (byte)1, 
+                                       "NO");
             return table.addColumn(column);
         }
         return false;
     }
     
-    public static boolean isNonPrimaryKeyColumnValid(String column, Table table, int ordinalPosition) {
+    public static boolean isNonPrimaryKeyColumnValid(String column, TableMetaData table, byte ordinalPosition) {
         String[] tokens = column.trim().split("\\s+");
         if (tokens.length == 4)
             if (Helper.isNameValid(tokens[0]) && 
                 Helper.isDataType(tokens[1]) &&
                 tokens[2].equals("not") &&
                 tokens[3].equals("null")) {
-                Column c = new Column(tokens[0], false, false, ordinalPosition, Helper.getDataType(tokens[1]));
+                Column c = new Column(table.getTableName(),
+                                      tokens[0], 
+                                      tokens[1].toUpperCase(), 
+                                      ordinalPosition, 
+                                      "NO");
                 return table.addColumn(c);
             } 
         if (tokens.length == 2) {
             if (Helper.isNameValid(tokens[0]) && 
                 Helper.isDataType(tokens[1])) {
-                Column c = new Column(tokens[0], false, true, ordinalPosition, Helper.getDataType(tokens[1]));
+                Column c = new Column(table.getTableName(), 
+                                      tokens[0], 
+                                      tokens[1].toUpperCase(), 
+                                      ordinalPosition, 
+                                      "YES");
                 return table.addColumn(c);                
             }
         }

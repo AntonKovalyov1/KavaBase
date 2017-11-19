@@ -41,4 +41,8 @@ public class Page {
     public int getPageOffset() {
         return pageNumber * Helper.PAGE_SIZE;
     }
+    
+    public boolean isLeafPage() {
+        return pageHeader.getPageType() == Helper.LEAF_TABLE_PAGE_TYPE;
+    }
 }

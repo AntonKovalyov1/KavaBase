@@ -18,8 +18,8 @@ public class DML {
         //TODO
     }
     
-    public static Table getTable(String name) {
-        Table table = new Table(name);
+    public static TableMetaData getTable(String name) {
+        TableMetaData table = new TableMetaData(name);
         //TODO get table metadata
         return table;
     }
