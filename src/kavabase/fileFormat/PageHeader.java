@@ -13,19 +13,16 @@ public class PageHeader {
     private final byte numberOfCells;
     private final short cellsStartContentArea;
     private int pagePointer;
-    private final ArrayList<Short> cellsPointers;
     
     public PageHeader(final byte pageType, 
                       final byte numberOfCells, 
                       final short cellsStartContentArea, 
-                      final int pagePointer, 
-                      final ArrayList<Short> cellsPointers) {
+                      final int pagePointer) {
         
         this.pageType = pageType;
         this.numberOfCells = numberOfCells;
         this.cellsStartContentArea = cellsStartContentArea;
         this.pagePointer = pagePointer;
-        this.cellsPointers = cellsPointers;
     }
 
     /**
@@ -54,12 +51,5 @@ public class PageHeader {
      */
     public int getPagePointer() {
         return pagePointer;
-    }
-
-    /**
-     * @return the cellsPointers
-     */
-    public ArrayList<Short> getCellsPointers() {
-        return cellsPointers;
-    }    
+    }   
 }

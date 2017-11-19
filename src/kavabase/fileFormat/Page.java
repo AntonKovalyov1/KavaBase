@@ -1,6 +1,6 @@
 package kavabase.fileFormat;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -8,10 +8,14 @@ import java.util.Map;
  */
 public class Page {
     
+    private final int pageNumber;
     private final PageHeader pageHeader;
-    private final Map<Short, Cell> cells;
+    private final TreeMap<Integer, Cell> cells;
     
-    public Page(PageHeader pageHeader, Map<Short, Cell> cells) {
+    public Page(final int pageNumber,
+                final PageHeader pageHeader, 
+                final TreeMap<Integer, Cell> cells) {
+        this.pageNumber = pageNumber;
         this.pageHeader = pageHeader;
         this.cells = cells;
     }
@@ -26,7 +30,15 @@ public class Page {
     /**
      * @return the cells
      */
-    public Map<Short, Cell> getCells() {
+    public TreeMap<Integer, Cell> getCells() {
         return cells;
+    }
+    
+    public int getPageNumber() {
+        return pageNumber;
+    }
+    
+    public int getPageOffset() {
+        return pageNumber * Helper.PAGE_SIZE;
     }
 }
