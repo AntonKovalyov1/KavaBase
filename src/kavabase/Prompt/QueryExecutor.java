@@ -1,20 +1,29 @@
 package kavabase.Prompt;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import kavabase.fileFormat.FileOperations;
+
 /**
  *
  * @author axk176431
  */
 public class QueryExecutor {
     
+    private final ArrayList<TableMetaData> metaData = initMetadata();
+    
     public void execute(String query) {
         if (isShowTablesCommand(query)) {
-            DDL.showTables();
+            DDL.showTables(metaData);
         }
         else if (isCreateTableCommand(query)) {
-            DDL.createTable(query.substring(Command.CREATE_TABLE.length()).trim());
+            DDL.createTable(
+                    query.substring(Command.CREATE_TABLE.length()).trim(), 
+                    getMetaData());
         }
         else if (isDropTableCommand(query)) {
-            DDL.dropTable(query.substring(Command.DROP_TABLE.length()).trim());
+            DDL.dropTable(query.substring(Command.DROP_TABLE.length()).trim(),
+                    getMetaData());
         }
         else if (isInsertIntoCommand(query)) {
             DML.insertInto(query.substring(Command.INSERT_INTO.length()).trim());
@@ -66,5 +75,20 @@ public class QueryExecutor {
     
     private boolean isExitCommand(String query) {
         return query.equals(Command.EXIT);
+    }
+
+    private ArrayList<TableMetaData> initMetadata() {
+        if (!FileOperations.fileExists(FileOperations.TABLES_PATH) ||
+            !FileOperations.fileExists(FileOperations.COLUMNS_PATH)) {
+            FileOperations.createMetaData();
+        }
+        return FileOperations.getMetaData();
+    }
+
+    /**
+     * @return the metadata
+     */
+    public ArrayList<TableMetaData> getMetaData() {
+        return metaData;
     }
 }

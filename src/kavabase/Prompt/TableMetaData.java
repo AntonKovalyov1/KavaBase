@@ -17,8 +17,10 @@ public class TableMetaData {
     }
     
     public boolean addColumn(Column column) {
-        if (columns.contains(column))
+        if (columns.contains(column)) {
+            System.out.println("add failed");
             return false;
+        }
         columns.add(column);
         return true;
     }
@@ -28,6 +30,14 @@ public class TableMetaData {
      */
     public ArrayList<Column> getColumns() {
         return columns;
+    }
+    
+    public ArrayList<String> getColumnNames() {
+        ArrayList<String> columnNames = new ArrayList<>();
+        for (Column column : columns) {
+            columnNames.add(column.getColumnName());
+        }
+        return columnNames;
     }
 
     /**
@@ -52,5 +62,15 @@ public class TableMetaData {
         int hash = 5;
         hash = 17 * hash + Objects.hashCode(this.tableName);
         return hash;
+    }
+    
+    @Override
+    public String toString() {
+        String s = tableName;
+        s += "\n";
+        for (Column column : getColumns()) {
+            s += column.getColumnName() + " ";
+        }
+        return s;
     }
 }

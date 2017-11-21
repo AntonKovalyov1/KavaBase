@@ -53,7 +53,7 @@ public class Helper {
                  name.contains("//s+") ||
                  name.matches(".*[!@#$%^&*()+=<>?.,].*") || 
                  isReservedWord(name) ||
-                 Character.isDigit(name.charAt(0)));
+                 !Character.isAlphabetic(name.charAt(0)));
     }
     
     private static ArrayList<String> initReservedWords() {

@@ -1,7 +1,10 @@
 package kavabase.Prompt;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import kavabase.DataFormat.DataType;
+import kavabase.fileFormat.FileOperations;
 import kavabase.fileFormat.Helper;
 
 /**
@@ -10,13 +13,22 @@ import kavabase.fileFormat.Helper;
  */
 public class DDL {
     
-    public static void showTables() {
-        //No parsing necessary
-        //TODO
+    public static void showTables(
+            final ArrayList<TableMetaData> metaData) {
+        TableDisplay td = new TableDisplay("Tables");
+        for (TableMetaData current : metaData) {
+            ArrayList<DataType> row = new ArrayList<>();
+            row.add(new DataType.CustomText(current.getTableName()));
+            td.addRecord(row);
+        }
+        td.display();
     }
     
-    public static boolean dropTable(String query) {
-        if (Helper.isNameValid(query)) {
+    public static boolean dropTable(String query, 
+            final ArrayList<TableMetaData> metadata) {
+        TableMetaData table = new TableMetaData(query);
+        if (metadata.contains(table)) {
+            //TODO
             System.out.println(Helper.SUCCESSFUL_QUERY);
             System.out.println("Table " + query + " dropped.");
             return true;
@@ -25,18 +37,19 @@ public class DDL {
         return false;
     }
     
-    public static boolean createTable(String query) {
+    public static boolean createTable(String query, 
+            final ArrayList<TableMetaData> metadata) {
+        System.out.println("Metadata size is: " + metadata.size());
         String tableName = getTableName(query);
         if (!Helper.isNameValid(tableName)) {
             Error.notValidTableName();
             return false;
         }
-        if (tableExists(tableName)) {
+        TableMetaData table = new TableMetaData(tableName);
+        if (metadata.contains(table)) {
             Error.tableExistsError(tableName);
             return false;
-        }
-        
-        TableMetaData table = new TableMetaData(tableName);
+        }        
         query = query.substring(tableName.length()).trim();
         if (!(query.startsWith("(") && query.endsWith(")"))) {
             Error.syntaxError();
@@ -58,23 +71,71 @@ public class DDL {
         }
         
         for (int i = 1; i < columns.length; i++) {
-            if (!isNonPrimaryKeyColumnValid(columns[i], table, (byte)i)) {
+            if (!isNonPrimaryKeyColumnValid(columns[i], table, (byte)(i + 1))) {
                 Error.columnDefinitionError();
                 return false;
             }
         }
-        //TODO
-        //Create table
+        insertNewEntryInTables(tableName, metadata);
+        insertEntriesInColumns(table, metadata);
+        metadata.add(table);
         System.out.println("Table " + tableName + " created.");
         System.out.println(Helper.SUCCESSFUL_QUERY);
         return true;
     }
     
-    private static boolean tableExists(String tableName) {
-        File file = new File(tableName + Helper.TABLE_FILE_EXTENSION);
-        if (file.exists() && !file.isDirectory())
-            return true;
-        return false;
+    private static void insertNewEntryInTables(final String tableName,
+            final ArrayList<TableMetaData> metaData) {
+        DataType rowid = new DataType.Int(metaData.size() + 1);
+        DataType name = new DataType.CustomText(tableName);
+        ArrayList<DataType> row = new ArrayList<>();
+        row.add(rowid);
+        row.add(name);
+        try {
+            RandomAccessFile raf = new RandomAccessFile(
+                    FileOperations.TABLES_PATH, "rw");
+            FileOperations.insert(raf, row);
+            raf.close();
+        }
+        catch (IOException ex) {
+            System.out.println("Table insertion IOEception is thrown.");
+        }
+    }
+    
+    private static void insertEntriesInColumns(final TableMetaData table, 
+            final ArrayList<TableMetaData> metaData) {
+        try {
+            RandomAccessFile raf = new RandomAccessFile(
+                    FileOperations.COLUMNS_PATH, "rw");
+            ArrayList<Column> columns = table.getColumns();
+            System.out.println("Columns size: " + columns.size());
+            int rowid = getNumberOfRowsFromColumnsTable(metaData) + 1;
+            for (Column current : columns) {
+                System.out.println("Row id: " + rowid);
+                ArrayList<DataType> row = new ArrayList<>();
+                row.add(new DataType.Int(rowid));
+                row.add(new DataType.CustomText(current.getTableName()));
+                row.add(new DataType.CustomText(current.getColumnName()));
+                row.add(new DataType.CustomText(current.getDataType()));
+                row.add(new DataType.TinyInt(current.getOrdinalPosition()));
+                row.add(new DataType.CustomText(current.isNullable()));
+                rowid++;
+                FileOperations.insert(raf, row);
+            }
+            raf.close();
+        }
+        catch (IOException ex) {
+            System.out.println("Column insertion IOEception is thrown."); 
+        }
+    }
+    
+    private static int getNumberOfRowsFromColumnsTable(
+            final ArrayList<TableMetaData> metaData) {
+        int size = 0;
+        for (TableMetaData current : metaData) {
+            size += current.getColumns().size();
+        }
+        return size;
     }
     
     private static String getTableName(String query) {
@@ -85,7 +146,8 @@ public class DDL {
         return query;
     }
     
-    private static boolean isPrimaryKeyColumnValid(String primaryKeyColumn, TableMetaData table) {
+    private static boolean isPrimaryKeyColumnValid(String primaryKeyColumn, 
+            TableMetaData table) {
         String[] tokens = primaryKeyColumn.trim().split("\\s+");
         if (tokens.length != 4)
             return false;
@@ -103,7 +165,8 @@ public class DDL {
         return false;
     }
     
-    public static boolean isNonPrimaryKeyColumnValid(String column, TableMetaData table, byte ordinalPosition) {
+    public static boolean isNonPrimaryKeyColumnValid(String column, 
+            TableMetaData table, byte ordinalPosition) {
         String[] tokens = column.trim().split("\\s+");
         if (tokens.length == 4)
             if (Helper.isNameValid(tokens[0]) && 

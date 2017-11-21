@@ -11,29 +11,15 @@ import kavabase.DataFormat.DataType;
 public abstract class Cell {
     
     public abstract short getSize();
-    
-    private short offset;
-    
-    public Cell(short offset) {
-        this.offset = offset;
-    }
-
-    /**
-     * @return the offset
-     */
-    public short getOffset() {
-        return (short)(offset - getSize());
-    }
-    
+    public abstract int getKey();
+   
     public static class InteriorCell extends Cell {
         
-        private final int leftChildPointer;
+        private int leftChildPointer;
         private final int key;
         
         public InteriorCell(final int leftChildPointer, 
-                            final int key, 
-                            final short offset) {
-            super(offset);
+                            final int key) {
             this.leftChildPointer = leftChildPointer;
             this.key = key;
         }
@@ -53,8 +39,16 @@ public abstract class Cell {
         /**
          * @return the key
          */
+        @Override
         public int getKey() {
             return key;
+        }
+
+        /**
+         * @param leftChildPointer the leftChildPointer to set
+         */
+        public void setLeftChildPointer(int leftChildPointer) {
+            this.leftChildPointer = leftChildPointer;
         }
     }
     
@@ -62,8 +56,7 @@ public abstract class Cell {
 
         private final ArrayList<DataType> records;
 
-        public LeafCell(final ArrayList<DataType> records, final short offset) {
-            super(offset);
+        public LeafCell(final ArrayList<DataType> records) {
             this.records = records;
         }
 
@@ -81,6 +74,7 @@ public abstract class Cell {
         /**
          * @return the key
          */
+        @Override
         public int getKey() {
             return (int)records.get(0).getData();
         }
