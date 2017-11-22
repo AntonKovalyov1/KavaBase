@@ -1,4 +1,4 @@
-package kavabase.Prompt;
+package kavabase.Query;
 
 /**
  *
@@ -24,5 +24,17 @@ public class Error {
     
     public static void columnDefinitionError() {
         System.out.println("Error: check your column definition.");
+    }
+    
+    public static void tableDoesNotExistError(String tableName) {
+        System.out.println("Error: table " + tableName + " does not exist.");
+    }
+    
+    public static void notNullError(String input) {
+        System.out.println("Error: " + input + " cannot be null.");
+    }
+    
+    public static void reservedTableNameError(String tableName) {
+        System.out.println("Error: " + tableName + " is a reserved table.");
     }
 }

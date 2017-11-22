@@ -1,10 +1,10 @@
 package kavabase.fileFormat;
 
+import kavabase.Commons.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.Stack;
@@ -12,9 +12,9 @@ import java.util.TreeMap;
 import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.DataType.CustomText;
 import kavabase.DataFormat.SerialType;
-import kavabase.Prompt.Column;
-import kavabase.Prompt.TableDisplay;
-import kavabase.Prompt.TableMetaData;
+import kavabase.Query.Column;
+import kavabase.Query.TableDisplay;
+import kavabase.Query.TableMetaData;
 import kavabase.fileFormat.Cell.LeafCell;
 import kavabase.fileFormat.Cell.InteriorCell;
 
@@ -28,16 +28,30 @@ public class FileOperations {
     public static final String COLUMNS_NAME = "davisbase_columns";
     public static final String TABLES_PATH = "data/catalog/davisbase_tables.tbl";
     public static final String COLUMNS_PATH = "data/catalog/davisbase_columns.tbl";
-    public static final String USER_DATA_PATH = "data/user_data";
+    public static final String USER_DATA_PATH = "data/user_data/";
     public static final String TABLE_EXTENSION = ".tbl";
 
-    public static void createEmptyPage(String file, byte pageType) throws IOException {
+    public static void createEmptyPage(String file, byte pageType) 
+            throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        raf.setLength(Helper.PAGE_SIZE);
+        raf.seek(0);
         raf.write(pageType);
         raf.writeByte(0);
         raf.writeShort(512);
-        raf.writeInt(0);
+        raf.writeInt(-1);
         raf.close();
+    }
+    
+    public static void createTableFile(String tableName) {
+        try {
+        createEmptyPage(USER_DATA_PATH + tableName + TABLE_EXTENSION, 
+                        Helper.LEAF_TABLE_PAGE_TYPE);
+        }
+        catch (IOException ex) {
+            System.out.println("IOException: table " + tableName + 
+                    " not created.");
+        }
     }
 
     public static void insertLeafCell(LeafCell leafCell,
@@ -267,7 +281,6 @@ public class FileOperations {
 
         //read cells
         if (pageType == Helper.INTERIOR_TABLE_PAGE_TYPE) {
-            TreeMap<Integer, Cell> cells = new TreeMap<>();
             for (int i = 0; i < numberOfCells; i++) {
                 raf.seek(getOffset(pageNumber, cellPointers.get(i)));
                 int leftChildPointer = raf.readInt();
@@ -438,10 +451,10 @@ public class FileOperations {
         }
         RandomAccessFile raf = new RandomAccessFile(path, "r");
         Page page = getLeftmostLeafPage(raf);
-        System.out.println("testhhkjhkhkjhkhkhkhkjhkjhkjh");
         TableDisplay tableDisplay = new TableDisplay(
                 tableMetaData.getColumnNames());
         int rightPagePointer;
+        System.out.println("cells size: " + page.getCells().size());
         do {
             for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
                 LeafCell leafCell = (LeafCell) cell.getValue();
@@ -528,10 +541,10 @@ public class FileOperations {
         }
         Cell cell = new LeafCell(row);
         page.addCell(cell);
+        System.out.println("cell added to page!");
         if (!page.isOverFlow()) {
-            System.out.println("test thisuhiuhiuhiiuhihiu");
+            System.out.println("page about to be written!");
             writePage(raf, page);
-//            raf.close();
             return true;
         }
         //Split page
@@ -610,7 +623,6 @@ public class FileOperations {
                 }
             }
         }
-//        raf.close();
         return true;
     }
  

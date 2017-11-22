@@ -29,12 +29,17 @@ public abstract class DataType<T> {
     public byte getSerialTypeCode() {
         return serialType.getCode();
     }    
+    
     public byte getContentSize() {
         return serialType.getContentSize();
     }
     
+    @Override
+    public String toString() {
+        return getData() == null ? "NULL" : getData().toString();
+    }
+    
     public abstract byte[] toByteArray();
-    public abstract boolean compare(T other, Comparison comparison);
     
     public static class TinyInt extends DataType<Byte> {
         
@@ -44,11 +49,6 @@ public abstract class DataType<T> {
         
         public TinyInt(byte data) {
             super(data, SerialType.TINYINT);
-        }
-
-        @Override
-        public boolean compare(Byte other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
         
         @Override
@@ -71,11 +71,6 @@ public abstract class DataType<T> {
         }
         
         @Override
-        public boolean compare(Short other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-        
-        @Override
         public byte[] toByteArray() {
             return ByteBuffer.allocate(getContentSize())
                              .order(ByteOrder.BIG_ENDIAN)
@@ -92,11 +87,6 @@ public abstract class DataType<T> {
         
         public Int(int data) {
             super(data, SerialType.INT);
-        }
-
-        @Override
-        public boolean compare(Integer other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
         @Override
@@ -117,11 +107,6 @@ public abstract class DataType<T> {
         public BigInt(long data) {
             super(data, SerialType.BIGINT);
         }
-
-        @Override
-        public boolean compare(Long other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
         
         @Override
         public byte[] toByteArray() {
@@ -140,11 +125,6 @@ public abstract class DataType<T> {
         
         public Real(float data) {
             super(data, SerialType.REAL);
-        }
-
-        @Override
-        public boolean compare(Float other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
         
         @Override
@@ -167,11 +147,6 @@ public abstract class DataType<T> {
         }
         
         @Override
-        public boolean compare(Double other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-        
-        @Override
         public byte[] toByteArray() {
             return ByteBuffer.allocate(getContentSize())
                              .order(ByteOrder.BIG_ENDIAN)
@@ -188,11 +163,6 @@ public abstract class DataType<T> {
         
         public CustomDateTime(long data) {
             super(data, SerialType.DATETIME);
-        }
-
-        @Override
-        public boolean compare(Long other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
         
         @Override 
@@ -218,11 +188,6 @@ public abstract class DataType<T> {
         
         public CustomDate(long data) {
             super(data, SerialType.DATE);
-        }
-
-        @Override
-        public boolean compare(Long other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
         
         @Override 
@@ -262,15 +227,15 @@ public abstract class DataType<T> {
         public byte getContentSize() {
             return n;
         }
-
-        @Override
-        public boolean compare(String other, Comparison comparison) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        } 
         
         @Override
         public byte[] toByteArray() {
             return getData().getBytes();
+        }
+        
+        @Override
+        public String toString() {
+            return getData().isEmpty() ? "NULL" : getData();
         }
     }
 }

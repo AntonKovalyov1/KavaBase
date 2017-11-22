@@ -1,7 +1,6 @@
-package kavabase.Prompt;
+package kavabase.Query;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import kavabase.fileFormat.FileOperations;
 
 /**
@@ -26,16 +25,20 @@ public class QueryExecutor {
                     getMetaData());
         }
         else if (isInsertIntoCommand(query)) {
-            DML.insertInto(query.substring(Command.INSERT_INTO.length()).trim());
+            DML.insertInto(query.substring(Command.INSERT_INTO.length()).trim(),
+                           getMetaData());
         }
         else if (isDeleteFromCommand(query)) {
-            DML.deleteFrom(query.substring(Command.DELETE_FROM.length()).trim());
+            DML.deleteFrom(query.substring(Command.DELETE_FROM.length()).trim(),
+                           getMetaData());
         }                                
         else if (isUpdateCommand(query)) {
-            DML.update(query.substring(Command.UPDATE.length()).trim());
+            DML.update(query.substring(Command.UPDATE.length()).trim(),
+                       getMetaData());
         }
         else if (isSelectCommand(query)) {
-            VDL.select(query.substring(Command.SELECT.length()).trim());
+            VDL.select(query.substring(Command.SELECT.length()).trim(),
+                       getMetaData());
         }
         else if (isExitCommand(query)) {
             VDL.exit();

@@ -2,9 +2,8 @@ package kavabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import kavabase.Prompt.Prompt;
-import kavabase.Prompt.TableMetaData;
+import kavabase.Query.Prompt;
+import kavabase.Query.TableMetaData;
 import kavabase.fileFormat.FileOperations;
 
 /**
@@ -18,8 +17,8 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-//         Prompt.run();
         FileOperations.createMetaData();
+//        Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
 //        Page page = FileOperations.readPage(raf, 0);
 //        //FileOperations.getMetaData();
@@ -47,8 +46,8 @@ public class MainApp {
 //        FileOperations.insert(raf, row2);
         ArrayList<TableMetaData> metaData = FileOperations.getMetaData();
         TableMetaData t = new TableMetaData("davisbase_columns");
-        int index = metaData.indexOf(t);
-        FileOperations.selectAll(metaData.get(index));
+//        int index = metaData.indexOf(t);
+        FileOperations.selectAll(metaData.get(1));
 //        for (Map.Entry<String, TableMetaData> current : metaData.entrySet()) {
 //            System.out.println(current.getValue().getColumns().size());
 //        }

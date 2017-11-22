@@ -5,20 +5,6 @@ package kavabase.DataFormat;
  * @author Anton
  */
 public enum SerialType {
-//    
-//    public static final byte NULL_1 = 0x00;
-//    public static final byte NULL_2 = 0x01;
-//    public static final byte NULL_4 = 0X02;
-//    public static final byte NULL_8 = 0x03;
-//    public static final byte TINYINT = 0x04;
-//    public static final byte SMALLINT = 0x05;
-//    public static final byte INT = 0x06;
-//    public static final byte BIGINT = 0x07;
-//    public static final byte REAL = 0x08;
-//    public static final byte DOUBLE = 0x09;
-//    public static final byte DATETIME = 0x0A;
-//    public static final byte DATE = 0x0B;
-//    public static final byte TEXT = 0x0C;
     
     NULL_1 {
         @Override

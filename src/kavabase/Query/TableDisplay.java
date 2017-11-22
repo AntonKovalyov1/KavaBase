@@ -1,7 +1,8 @@
-package kavabase.Prompt;
+package kavabase.Query;
 
 import java.util.ArrayList;
 import kavabase.DataFormat.DataType;
+import kavabase.DataFormat.DataType.TinyInt;
 
 /**
  *
@@ -11,25 +12,32 @@ public class TableDisplay {
     
     private final ArrayList<String> columns;
     private final ArrayList<ArrayList<DataType>> data = new ArrayList<>();
+    private boolean empty = true;
 
     public TableDisplay(final String columnName) {
+        // One column table
         columns = new ArrayList<>();
         columns.add(columnName);
+        initData();
     }
     
     public TableDisplay(final ArrayList<String> columns) {
-        System.out.println("The columns size is: " + columns.size());
         this.columns = columns;
+        initData();
     }   
     
     public void addRecord(final ArrayList<DataType> record) {
+        if (empty) {
+            data.remove(0);
+            empty = false;
+        }
         data.add(record);
     }
     
     public int getMaximumSizeColumn(final ArrayList<DataType> column) {
-        int max = column.get(0).getData().toString().length();
+        int max = column.get(0).toString().length();
         for (int i = 1; i < column.size(); i++) {
-            int current = column.get(i).getData().toString().length();
+            int current = column.get(i).toString().length();
             if (current > max)
                 max = current;
         }
@@ -77,7 +85,7 @@ public class TableDisplay {
         for (int i = 0; i < columnsSizes.size(); i++) {
             System.out.print("| ");
             System.out.format("%-" + columnsSizes.get(i) + "s", 
-                              record.get(i).getData());
+                              record.get(i).toString());
             System.out.print(" ");
         }
         System.out.print("|");
@@ -93,5 +101,13 @@ public class TableDisplay {
         }
         System.out.print("|");
         System.out.println("");
+    }
+
+    private void initData() {
+        ArrayList<DataType> emptyRow = new ArrayList<>();
+        columns.forEach((item) -> {
+            emptyRow.add(new TinyInt());
+        });
+        data.add(emptyRow);
     }
 }

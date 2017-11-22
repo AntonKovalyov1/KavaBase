@@ -1,4 +1,4 @@
-package kavabase.Prompt;
+package kavabase.Query;
 
 import java.util.Scanner;
 

@@ -4,7 +4,7 @@ package kavabase.DataFormat;
  *
  * @author Anton
  */
-public enum Comparison {
+public enum Operator {
     
     EQUAL {
         @Override
@@ -20,6 +20,16 @@ public enum Comparison {
         @Override
         public String toString() {
             return "=";
+        }
+
+        @Override
+        public boolean compare(double a, double b) {
+            return a == b;
+        }
+        
+        @Override
+        public boolean compare(String s1, String s2) {
+            return s1.equals(s2);
         }
     },
     LESS {
@@ -37,6 +47,16 @@ public enum Comparison {
         public String toString() {
             return "<";
         }
+
+        @Override
+        public boolean compare(double a, double b) {
+            return a < b;
+        }
+
+        @Override
+        public boolean compare(String s1, String s2) {
+            return s1.compareTo(s2) < 0;
+        }
     },
     LESS_OR_EQUAL {
         @Override
@@ -52,6 +72,16 @@ public enum Comparison {
         @Override
         public String toString() {
             return "<=";
+        }
+
+        @Override
+        public boolean compare(double a, double b) {
+            return a <= b;
+        }
+
+        @Override
+        public boolean compare(String s1, String s2) {
+            return s1.compareTo(s2) <= 0;
         }
     },
     GREATER {
@@ -69,6 +99,16 @@ public enum Comparison {
         public String toString() {
             return ">";
         }
+
+        @Override
+        public boolean compare(double a, double b) {
+            return a > b;
+        }
+
+        @Override
+        public boolean compare(String s1, String s2) {
+            return s1.compareTo(s2) > 0;
+        }
     },
     GREATER_OR_EQUAL {
         @Override
@@ -84,6 +124,16 @@ public enum Comparison {
         @Override
         public String toString() {
             return ">=";
+        }
+
+        @Override
+        public boolean compare(double a, double b) {
+            return a >= b;
+        }
+
+        @Override
+        public boolean compare(String s1, String s2) {
+            return s1.compareTo(s2) >= 0;
         }
     },
     NOT_VALID {
@@ -101,14 +151,27 @@ public enum Comparison {
         public String toString() {
             return "not valid";
         }
+
+        @Override
+        public boolean compare(double a, double b) {
+            throw new UnsupportedOperationException("Not a valid operator.");
+        }
+
+        @Override
+        public boolean compare(String s1, String s2) {
+            throw new UnsupportedOperationException("Not a valid operator.");
+        }
     };
     
     public abstract byte getCode();
     public abstract boolean isValid();
+    public abstract boolean compare(double a, double b);
+    public abstract boolean compare(String s1, String s2);
+    
     @Override
     public abstract String toString();
     
-    public Comparison parseComparison(String comparison) {
+    public Operator parseComparison(String comparison) {
         switch(comparison) {
             case "=": return EQUAL;
             case "<": return LESS;

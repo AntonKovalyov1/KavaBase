@@ -1,10 +1,9 @@
-package kavabase.fileFormat;
+package kavabase.Commons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.DataType.Int;
 
 /**
  *
@@ -27,7 +26,8 @@ public class Helper {
     
     public static final String SUCCESSFUL_QUERY = "Query succesful.";
     public static final String TABLE_FILE_EXTENSION = ".tbl";
-    public static final Map<String, DataType> TEXT_TO_DATATYPE_MAP = initTextToDataTypeMap();
+    public static final Map<String, DataType> TEXT_TO_DATATYPE_MAP = 
+            initTextToDataTypeMap();
 
     private static Map<String, DataType> initTextToDataTypeMap() {
         Map<String, DataType> map = new HashMap<>();
@@ -51,7 +51,7 @@ public class Helper {
     public static boolean isNameValid(String name) {
         return !(name.isEmpty() ||
                  name.contains("//s+") ||
-                 name.matches(".*[!@#$%^&*()+=<>?.,].*") || 
+                 name.matches(".*[!@#$%^*()+=<>?.,].*") || 
                  isReservedWord(name) ||
                  !Character.isAlphabetic(name.charAt(0)));
     }
@@ -80,6 +80,16 @@ public class Helper {
         list.add("key");
         
         return list;
+    }
+    
+    public static String getWord(String query) {
+        for (int i = 0; i < query.length(); i++) {
+            if (query.charAt(i) == ' ' || 
+                query.charAt(i) == '(' ||
+                query.charAt(i) == ',')
+                return query.substring(0, i).trim();
+        }
+        return query;
     }
     
     public static boolean isDataType(String dataType) {

@@ -1,11 +1,11 @@
-package kavabase.Prompt;
+package kavabase.Query;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import kavabase.DataFormat.DataType;
 import kavabase.fileFormat.FileOperations;
-import kavabase.fileFormat.Helper;
+import kavabase.Commons.Helper;
 
 /**
  *
@@ -40,7 +40,7 @@ public class DDL {
     public static boolean createTable(String query, 
             final ArrayList<TableMetaData> metadata) {
         System.out.println("Metadata size is: " + metadata.size());
-        String tableName = getTableName(query);
+        String tableName = Helper.getWord(query);
         if (!Helper.isNameValid(tableName)) {
             Error.notValidTableName();
             return false;
@@ -78,6 +78,7 @@ public class DDL {
         }
         insertNewEntryInTables(tableName, metadata);
         insertEntriesInColumns(table, metadata);
+        FileOperations.createTableFile(tableName);
         metadata.add(table);
         System.out.println("Table " + tableName + " created.");
         System.out.println(Helper.SUCCESSFUL_QUERY);
@@ -136,14 +137,6 @@ public class DDL {
             size += current.getColumns().size();
         }
         return size;
-    }
-    
-    private static String getTableName(String query) {
-        for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == ' ' || query.charAt(i) == '(')
-                return getTableName(query.substring(0, i).trim());
-        }
-        return query;
     }
     
     private static boolean isPrimaryKeyColumnValid(String primaryKeyColumn, 
