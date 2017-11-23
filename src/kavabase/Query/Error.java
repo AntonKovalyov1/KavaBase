@@ -31,10 +31,14 @@ public class Error {
     }
     
     public static void notNullError(String input) {
-        System.out.println("Error: " + input + " cannot be null.");
+        System.out.println("Error: column c " + input + " cannot be null.");
     }
     
     public static void reservedTableNameError(String tableName) {
         System.out.println("Error: " + tableName + " is a reserved table.");
+    }
+    
+    public static void columnDoesNotExist(String column) {
+        System.out.println("Error: column " + column + " does not exist.");
     }
 }

@@ -17,11 +17,8 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-        String s = "a ) values ( b";
-        String[] tokens = s.split("\\s*\\)\\s*values\\s*\\(\\s*");
-        System.out.println(tokens[0] + tokens[1]);
 //        FileOperations.createMetaData();
-//        Prompt.run();
+          Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
 //        Page page = FileOperations.readPage(raf, 0);
 //        //FileOperations.getMetaData();
