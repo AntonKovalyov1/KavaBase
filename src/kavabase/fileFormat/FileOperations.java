@@ -11,8 +11,12 @@ import java.util.Stack;
 import java.util.TreeMap;
 import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.DataType.CustomText;
+import kavabase.DataFormat.Operator;
 import kavabase.DataFormat.SerialType;
 import kavabase.Query.Column;
+import kavabase.Query.Comparison;
+import kavabase.Query.Comparison.NumberComparison;
+import kavabase.Query.Comparison.TextComparison;
 import kavabase.Query.TableDisplay;
 import kavabase.Query.TableMetaData;
 import kavabase.fileFormat.Cell.LeafCell;
@@ -206,7 +210,6 @@ public class FileOperations {
             throws IOException {
         //Write header
         raf.seek(page.getPageOffset());
-        System.out.println("The page offset is: " + page.getPageOffset());
         raf.writeByte(page.getPageType());
         raf.writeByte(page.getNumberOfCells());
         raf.writeShort(page.getCellsStartArea());
@@ -216,7 +219,6 @@ public class FileOperations {
         TreeMap<Integer, Short> cellOffsets = page.getCellOffsets();
         for (Map.Entry<Integer, Short> entry : cellOffsets.entrySet()) {
             raf.writeShort(entry.getValue());
-            System.out.println("key " + entry.getKey() + " offset is " + entry.getValue());
         }
 
         //Write cells
@@ -257,7 +259,6 @@ public class FileOperations {
                                          final InteriorCell cell)
             throws IOException {
         raf.seek(offset);
-        System.out.println("The offset of the interior cell is: " + offset);
         raf.writeInt(cell.getLeftChildPointer());
         raf.writeInt(cell.getKey());
     }
@@ -389,17 +390,12 @@ public class FileOperations {
             page = getLeftmostLeafPage(raf);
             done = false;
             int currentTableIndex = 0;
-            System.out.println("table names size: " + tableNames.size());
-            for (String s : tableNames) {
-                System.out.println(s + " ");
-            }
             TableMetaData tableMetaData = new TableMetaData(
                     tableNames.get(currentTableIndex));
-            do {System.out.println("next page");
+            do {
                 for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
                     LeafCell leafCell = (LeafCell) cell.getValue();
                     ArrayList<DataType> record = leafCell.getRecords();
-                    System.out.println("record table name: " + record.get(1).getData() + ", key " + cell.getKey());
                     if (tableMetaData.getTableName().equals(
                             record.get(1).getData())) {
                         tableMetaData.addColumn(createMetaDataColumn(record));
@@ -434,9 +430,7 @@ public class FileOperations {
         return file.exists() && !file.isDirectory();
     }
     
-    public static void selectAll(final TableMetaData tableMetaData) 
-            throws IOException {
-        String tableName = tableMetaData.getTableName();
+    public static String getPathToTable(String tableName) {
         String path;
         switch (tableName) {
             case TABLES_NAME:
@@ -449,17 +443,63 @@ public class FileOperations {
                 path = USER_DATA_PATH + tableName + TABLE_EXTENSION;
                 break;
         }
+        return path;
+    }
+    
+    public static void selectAll(final TableMetaData tableMetaData) 
+            throws IOException {
+        String tableName = tableMetaData.getTableName();
+        String path = getPathToTable(tableName);
         RandomAccessFile raf = new RandomAccessFile(path, "r");
         Page page = getLeftmostLeafPage(raf);
         TableDisplay tableDisplay = new TableDisplay(
                 tableMetaData.getColumnNames());
         int rightPagePointer;
-        System.out.println("cells size: " + page.getCells().size());
         do {
             for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
                 LeafCell leafCell = (LeafCell) cell.getValue();
                 ArrayList<DataType> row = leafCell.getRecords();
                 tableDisplay.addRecord(row);
+            }
+            rightPagePointer = page.getPagePointer();
+            if (rightPagePointer != -1) {
+                page = readPage(raf, rightPagePointer);
+            }
+        }
+        while(rightPagePointer != -1);
+        tableDisplay.display();
+    }
+    
+    public static void selectAll(final TableMetaData tableMetaData, 
+            final Comparison comparison) throws IOException {
+        String tableName = tableMetaData.getTableName();
+        String path = getPathToTable(tableName);
+        RandomAccessFile raf = new RandomAccessFile(path, "r");
+        Page page = getLeftmostLeafPage(raf);
+        TableDisplay tableDisplay = new TableDisplay(
+                tableMetaData.getColumnNames());
+        int rightPagePointer;
+        do {
+            for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
+                LeafCell leafCell = (LeafCell) cell.getValue();
+                ArrayList<DataType> row = leafCell.getRecords();
+                int index = comparison.getColumnIndex();
+                Operator operator = comparison.getOperator();
+                if (comparison instanceof NumberComparison) {
+                    double input = ((NumberComparison)comparison).getNumber();
+                    double value = Double.parseDouble(row.get(index)
+                            .getData().toString());
+                    if (operator.compare(value, input)) {
+                        tableDisplay.addRecord(row);
+                    }
+                }
+                else if (comparison instanceof TextComparison) {
+                    String input = ((TextComparison)comparison).getText();
+                    String value = row.get(index).getData().toString();
+                    if (operator.compare(value, input)) {
+                        tableDisplay.addRecord(row);
+                    }
+                }
             }
             rightPagePointer = page.getPagePointer();
             if (rightPagePointer != -1) {
@@ -476,7 +516,6 @@ public class FileOperations {
         while (!page.isLeafPage()) {
             InteriorCell leftmostInteriorCell = (InteriorCell)
                     page.getCells().firstEntry().getValue();
-            System.out.println("interior key is: " + leftmostInteriorCell.getKey()); // key is messed up
             int childPage = leftmostInteriorCell.getLeftChildPointer();
             page = readPage(raf, childPage); // check this, there is bug
         }
@@ -541,15 +580,12 @@ public class FileOperations {
         }
         Cell cell = new LeafCell(row);
         page.addCell(cell);
-        System.out.println("cell added to page!");
         if (!page.isOverFlow()) {
-            System.out.println("page about to be written!");
             writePage(raf, page);
             return true;
         }
         //Split page
         int splitKey = page.getSplitKey();
-        System.out.println("And the split key is: " + splitKey);
         TreeMap<Integer, Cell> cells = page.getCells();
         int minKey = cells.firstKey();
         int maxKey = cells.lastKey();
@@ -573,10 +609,8 @@ public class FileOperations {
                 leftPage.setPageNumber(leftPageNumber);
                 Page root = new Page(Helper.INTERIOR_TABLE_PAGE_TYPE);
                 root.setPagePointer(rightPage.getPageNumber());
-                System.out.println("Root page pointer: " + root.getPagePointer());
                 root.addCell(new InteriorCell(leftPage.getPageNumber(), 
                                               leftPage.getCells().lastKey()));
-                System.out.println("Root cell pointer: " + leftPage.getPageNumber());
                 writePage(raf, root);
                 writePage(raf, leftPage);
                 writePage(raf, rightPage);

@@ -171,7 +171,7 @@ public enum Operator {
     @Override
     public abstract String toString();
     
-    public Operator parseComparison(String comparison) {
+    public static Operator parseComparison(String comparison) {
         switch(comparison) {
             case "=": return EQUAL;
             case "<": return LESS;

@@ -39,7 +39,6 @@ public class DDL {
     
     public static boolean createTable(String query, 
             final ArrayList<TableMetaData> metadata) {
-        System.out.println("Metadata size is: " + metadata.size());
         String tableName = Helper.getWord(query);
         if (!Helper.isNameValid(tableName)) {
             Error.notValidTableName();
@@ -109,10 +108,8 @@ public class DDL {
             RandomAccessFile raf = new RandomAccessFile(
                     FileOperations.COLUMNS_PATH, "rw");
             ArrayList<Column> columns = table.getColumns();
-            System.out.println("Columns size: " + columns.size());
             int rowid = getNumberOfRowsFromColumnsTable(metaData) + 1;
             for (Column current : columns) {
-                System.out.println("Row id: " + rowid);
                 ArrayList<DataType> row = new ArrayList<>();
                 row.add(new DataType.Int(rowid));
                 row.add(new DataType.CustomText(current.getTableName()));

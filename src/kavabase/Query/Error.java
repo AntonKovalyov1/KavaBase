@@ -41,4 +41,12 @@ public class Error {
     public static void columnDoesNotExist(String column) {
         System.out.println("Error: column " + column + " does not exist.");
     }
+    
+    public static void notValidOperator(String operator) {
+        System.out.println("Error: " + operator + " is not a valid operator.");
+    }
+    
+    public static void notValidInput(String input) {
+        System.out.println("Error: " + input + " is not a valid input.");
+    }
 }
