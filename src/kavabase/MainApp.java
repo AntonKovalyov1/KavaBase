@@ -17,7 +17,10 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-        FileOperations.createMetaData();
+        String s = "a ) values ( b";
+        String[] tokens = s.split("\\s*\\)\\s*values\\s*\\(\\s*");
+        System.out.println(tokens[0] + tokens[1]);
+//        FileOperations.createMetaData();
 //        Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
 //        Page page = FileOperations.readPage(raf, 0);
@@ -44,10 +47,10 @@ public class MainApp {
 //        row2.add(new DataType.Int(3));
 //        row2.add(new DataType.CustomText("test1"));
 //        FileOperations.insert(raf, row2);
-        ArrayList<TableMetaData> metaData = FileOperations.getMetaData();
-        TableMetaData t = new TableMetaData("davisbase_columns");
-//        int index = metaData.indexOf(t);
-        FileOperations.selectAll(metaData.get(1));
+//        ArrayList<TableMetaData> metaData = FileOperations.getMetaData();
+//        TableMetaData t = new TableMetaData("davisbase_columns");
+////        int index = metaData.indexOf(t);
+//        FileOperations.selectAll(metaData.get(1));
 //        for (Map.Entry<String, TableMetaData> current : metaData.entrySet()) {
 //            System.out.println(current.getValue().getColumns().size());
 //        }

@@ -14,12 +14,12 @@ public abstract class DataType<T> {
     
     private final T data;
     private final SerialType serialType;
-    protected final boolean isNull;
+    private final boolean isNull;
     
-    public DataType(T data, SerialType serialType) {
+    public DataType(T data, SerialType serialType, boolean isNull) {
         this.data = data;
         this.serialType = serialType;
-        this.isNull = data == null;
+        this.isNull = isNull;
     }
     
     public T getData() {
@@ -36,7 +36,7 @@ public abstract class DataType<T> {
     
     @Override
     public String toString() {
-        return getData() == null ? "NULL" : getData().toString();
+        return isNull ? "NULL" : getData().toString();
     }
     
     public abstract byte[] toByteArray();
@@ -44,11 +44,11 @@ public abstract class DataType<T> {
     public static class TinyInt extends DataType<Byte> {
         
         public TinyInt() {
-            super(null, SerialType.NULL_1);
+            super((byte)0, SerialType.NULL_1, true);
         }
         
         public TinyInt(byte data) {
-            super(data, SerialType.TINYINT);
+            super(data, SerialType.TINYINT, false);
         }
         
         @Override
@@ -63,11 +63,11 @@ public abstract class DataType<T> {
     public static class SmallInt extends DataType<Short> {
         
         public SmallInt() {
-            super(null, SerialType.NULL_2);
+            super((short)0, SerialType.NULL_2, true);
         }
         
         public SmallInt(short data) {
-            super(data, SerialType.SMALLINT);
+            super(data, SerialType.SMALLINT, false);
         }
         
         @Override
@@ -82,11 +82,11 @@ public abstract class DataType<T> {
     public static class Int extends DataType<Integer> {
 
         public Int() {
-            super(null, SerialType.NULL_4);
+            super(0, SerialType.NULL_4, true);
         }
         
         public Int(int data) {
-            super(data, SerialType.INT);
+            super(data, SerialType.INT, false);
         }
 
         @Override
@@ -101,11 +101,11 @@ public abstract class DataType<T> {
     public static class BigInt extends DataType<Long> {
 
         public BigInt() {
-            super(null, SerialType.NULL_8);
+            super(0l, SerialType.NULL_8, true);
         }
         
         public BigInt(long data) {
-            super(data, SerialType.BIGINT);
+            super(data, SerialType.BIGINT, false);
         }
         
         @Override
@@ -120,11 +120,11 @@ public abstract class DataType<T> {
     public static class Real extends DataType<Float> {
 
         public Real() {
-            super(null, SerialType.NULL_4);
+            super(0f, SerialType.NULL_4, true);
         }
         
         public Real(float data) {
-            super(data, SerialType.REAL);
+            super(data, SerialType.REAL, false);
         }
         
         @Override
@@ -139,11 +139,11 @@ public abstract class DataType<T> {
     public static class CustomDouble extends DataType<Double> {
 
         public CustomDouble() {
-            super(null, SerialType.NULL_8);
+            super(0d, SerialType.NULL_8, true);
         }
         
         public CustomDouble(double data) {
-            super(data, SerialType.DOUBLE);
+            super(data, SerialType.DOUBLE, false);
         }
         
         @Override
@@ -158,11 +158,11 @@ public abstract class DataType<T> {
     public static class CustomDateTime extends DataType<Long> {
 
         public CustomDateTime() {
-            super(null, SerialType.NULL_8);
+            super(0l, SerialType.NULL_8, true);
         }
         
         public CustomDateTime(long data) {
-            super(data, SerialType.DATETIME);
+            super(data, SerialType.DATETIME, false);
         }
         
         @Override 
@@ -183,11 +183,11 @@ public abstract class DataType<T> {
     public static class CustomDate extends DataType<Long> {
         
         public CustomDate() {
-            super(null, SerialType.NULL_8);
+            super(0l, SerialType.NULL_8, true);
         }
         
         public CustomDate(long data) {
-            super(data, SerialType.DATE);
+            super(data, SerialType.DATE, false);
         }
         
         @Override 
@@ -210,11 +210,11 @@ public abstract class DataType<T> {
         private byte n = 0;
         
         public CustomText() {
-            super("", SerialType.TEXT);
+            super("", SerialType.TEXT, true);
         }
         
         public CustomText(String data) {
-            super(data, SerialType.TEXT);
+            super(data, SerialType.TEXT, false);
             n = (byte)data.length();
         }
         

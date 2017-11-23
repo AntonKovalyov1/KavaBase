@@ -36,25 +36,26 @@ public class DML {
         TableMetaData table = metaData.get(index);
         if (query.startsWith("values")) {
             query = query.substring("values".length()).trim();
-            if (!query.startsWith("(") && !query.endsWith(")")) {
-                Error.syntaxError();
+        if (query.length() < 3 || 
+            !query.startsWith("(") && !query.endsWith(")")) {
+            Error.syntaxError();
+            return false;
+        }
+        query = query.substring(1, query.length() - 1).trim();
+        if (query.startsWith(",") || query.endsWith(",")) {
+            Error.syntaxError();
+            return false;
+        }
+        String[] tokens = query.split("\\s*,\\s*");
+            if (tokens == null) {
                 return false;
             }
-            query = query.substring(1, query.length() - 1).trim();
-            if (query.startsWith(",") || query.endsWith(",")) {
-                Error.syntaxError();
-                return false;
-            }
-            String[] tokens = query.split(",");
             ArrayList<Column> columns = table.getColumns();
-            if (tokens.length != table.getColumns().size()) {
+            if (tokens.length > table.getColumns().size()) {
                 Error.columnDefinitionError();
                 return false;
             }
-            //trim tokens
-            for (int i = 0; i < tokens.length; i++) {
-                tokens[i] = tokens[i].trim();
-            }
+            //validate column input
             for (int i = 0; i < tokens.length; i++) {
                 if (!validateColumnInput(tokens[i], columns.get(i))) {
                     Error.columnDefinitionError();
@@ -66,6 +67,14 @@ public class DML {
             for (int i = 0; i < tokens.length; i++) {
                 row.add(getDataType(tokens[i], columns.get(i).getDataType()));
             }
+            //if columns size > tokens size add null rows if null accepted
+            for (int i = tokens.length; i < columns.size(); i++) {
+                if (columns.get(i).isNullable().equals("NO")) {
+                    Error.notNullError(columns.get(i).getColumnName());
+                    return false;
+                }
+                row.add(getDataType("null", columns.get(i).getDataType()));                
+            }
             if (!insert(row, tableName)) {
                 System.out.println("Record exists.");
                 System.out.println("Insertion unsuccesful.");
@@ -74,10 +83,17 @@ public class DML {
             System.out.println("Insertion succesful.");
             return true;
         }
-        if (query.startsWith("(")) {
-
+        if (!query.startsWith("(") || !query.endsWith(")")) {
+            Error.syntaxError();
+            return false;
         }
-
+        query = query.substring(1, query.length() - 1);
+        String[] enclosedValues = query.split("\\s*\\)\\s*values\\s*\\(\\s*");
+        if (enclosedValues.length != 2) {
+            Error.syntaxError();
+            return false;
+        }
+        //TODO
         return false;
     }
 
@@ -102,7 +118,7 @@ public class DML {
         if (input.equals("null")) {
             if (column.isNullable().equals("YES"))
                 return true;
-            Error.notNullError(input);
+            Error.notNullError(column.getColumnName());
             return false;
         }
         boolean result;
@@ -281,14 +297,14 @@ public class DML {
             RandomAccessFile raf = new RandomAccessFile(
                     FileOperations.USER_DATA_PATH + tableName + 
                     FileOperations.TABLE_EXTENSION, "rw");
-            if (!FileOperations.insert(raf, row))
-                return false;
+            boolean insert = FileOperations.insert(raf, row);
+            raf.close();
+            return insert;
         }
         catch (IOException ex) {
             System.out.println("IOException for insertion.");
             return false;
         }
-        return true;
     }
 
     private static boolean reservedTableName(String tableName) {
