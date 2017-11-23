@@ -688,7 +688,17 @@ public class FileOperations {
         return pages;
     }
     
-    private static int getKey(ArrayList<DataType> row) {
+    public static boolean delete(final RandomAccessFile raf, 
+                                 final int key) throws IOException {
+        Page page = search(raf, key);
+        if (getRecord(page, key) == null)
+            return false;
+        page.removeCell(key);
+        writePage(raf, page);
+        return true;
+    }
+    
+    private static int getKey(final ArrayList<DataType> row) {
         return (Integer)row.get(0).getData();
     }
 }

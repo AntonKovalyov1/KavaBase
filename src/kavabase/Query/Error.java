@@ -31,7 +31,7 @@ public class Error {
     }
     
     public static void notNullError(String input) {
-        System.out.println("Error: column c " + input + " cannot be null.");
+        System.out.println("Error: column " + input + " cannot be null.");
     }
     
     public static void reservedTableNameError(String tableName) {

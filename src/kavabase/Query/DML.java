@@ -14,6 +14,7 @@ import kavabase.DataFormat.DataType.SmallInt;
 import kavabase.DataFormat.DataType.TinyInt;
 import kavabase.fileFormat.FileOperations;
 import kavabase.Commons.Helper;
+import kavabase.DataFormat.Operator;
 
 /**
  *
@@ -29,7 +30,7 @@ public class DML {
             Error.tableDoesNotExistError(tableName);
             return false;
         }
-        if (reservedTableName(tableName)) {
+        if (Helper.reservedTableName(tableName)) {
             Error.reservedTableNameError(tableName);
             return false;
         }
@@ -141,7 +142,53 @@ public class DML {
 
     public static void deleteFrom(String query,
             final ArrayList<TableMetaData> metaData) {
-        //TODO
+        String[] tokens = query.split("\\s+");
+        if (tokens.length != 5) {
+            Error.syntaxError();
+            return;
+        }
+        int index = metaData.indexOf(new TableMetaData(tokens[0]));
+        if (index == -1) {
+            Error.tableDoesNotExistError(tokens[0]);
+            return;
+        }
+        TableMetaData table = metaData.get(index);
+        if (Helper.reservedTableName(table.getTableName())) {
+            Error.reservedTableNameError(table.getTableName());
+            return;
+        }
+        if (!tokens[1].equals("where")) {
+            Error.syntaxError();
+            return;
+        }
+        if (!table.getColumns().get(0).getColumnName().equals(tokens[2])) {
+            Error.columnDoesNotExist(tokens[2]);
+            return;
+        }
+        Operator operator = Operator.parseComparison(tokens[3]);
+        if (operator != Operator.EQUAL) {
+            Error.notValidOperator(tokens[3]);
+            return;
+        }
+        if (!validateIntInput(tokens[4])) {
+            Error.notValidInput(tokens[4]);
+            System.out.println("Integer expected.");
+            return;
+        }
+        int key = getInt(tokens[4]).getData();
+        try {
+            RandomAccessFile raf = new RandomAccessFile(
+                    FileOperations.getPathToTable(table.getTableName()), "rw");
+            if (FileOperations.delete(raf, key)) {
+                System.out.println("Deletion succesful.");
+            }
+            else {
+                System.out.println("Record does not exist.");
+            }
+        }
+        catch (IOException ex) {
+            System.out.println("IOException is thrown when deleting.");
+        }
     }
 
     public static void update(String query,
@@ -354,10 +401,5 @@ public class DML {
             System.out.println("IOException for insertion.");
             return false;
         }
-    }
-
-    private static boolean reservedTableName(String tableName) {
-        return tableName.equals("davisbase_tables")
-                || tableName.equals("davisbase_columns");
     }
 }

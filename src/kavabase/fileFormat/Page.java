@@ -38,6 +38,19 @@ public class Page {
         cellOffsets.put(key, cellsStartArea);
     }
     
+    public void removeCell(final int key) {
+        cells.remove(key);
+        TreeMap<Integer, Cell> temp = new TreeMap<>();
+        // deep copy
+        cells.entrySet().forEach((current) -> {
+            temp.put(current.getKey(), current.getValue());
+        });
+        cellOffsets.clear();
+        cells.clear();
+        cellsStartArea = Helper.PAGE_SIZE;
+        addCells(temp);
+    }
+    
     public void addCells(final Map<Integer, Cell> cells) {
         cells.entrySet().forEach((current) -> {
             addCell(current.getValue());

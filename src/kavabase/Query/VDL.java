@@ -2,8 +2,8 @@ package kavabase.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import kavabase.Commons.Helper;
 import kavabase.DataFormat.Operator;
-import kavabase.DataFormat.SerialType;
 import kavabase.Query.Comparison.NumberComparison;
 import kavabase.Query.Comparison.TextComparison;
 import kavabase.fileFormat.FileOperations;
@@ -57,7 +57,7 @@ public class VDL {
                     Error.notValidOperator(tokens[5]);
                     return;
                 }   
-                if (isColumnNumeric(column)) {
+                if (Helper.isColumnNumeric(column)) {
                     try {
                         double input = Double.parseDouble(tokens[6]);
                         Comparison comparison = new NumberComparison(index,
@@ -72,8 +72,8 @@ public class VDL {
                         System.out.println("IOException is thrown.");
                     }
                 }
-                if (isColumnText(column)) {
-                    if (!validateTextInput(tokens[6])) {
+                if (Helper.isColumnText(column)) {
+                    if (!Helper.validateTextInput(tokens[6])) {
                         Error.notValidInput(tokens[6]);
                         return;
                     }
@@ -98,19 +98,5 @@ public class VDL {
 
     public static void exit() {
         System.exit(0);
-    }
-
-    public static boolean isColumnNumeric(Column column) {
-        return SerialType.getSerialTypeFromText(column.getDataType())
-                .isNumber();
-    }
-
-    public static boolean isColumnText(Column column) {
-        return SerialType.getSerialTypeFromText(column.getDataType()).isText();
-    }
-    
-    private static boolean validateTextInput(String input) {
-        return (input.startsWith("\"") && input.endsWith("\"")
-                || input.startsWith("\'") && input.endsWith("\'"));
     }
 }

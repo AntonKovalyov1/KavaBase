@@ -2,6 +2,8 @@ package kavabase.Query;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import kavabase.DataFormat.DataType;
 import kavabase.fileFormat.FileOperations;
@@ -26,11 +28,33 @@ public class DDL {
     
     public static boolean dropTable(String query, 
             final ArrayList<TableMetaData> metadata) {
-        TableMetaData table = new TableMetaData(query);
-        if (metadata.contains(table)) {
-            //TODO
+        int index = metadata.indexOf(new TableMetaData(query));
+        if (index != -1) {
+            TableMetaData table = metadata.get(index);
+            if (Helper.reservedTableName(table.getTableName())) {
+                Error.reservedTableNameError(table.getTableName());
+                return false;
+            }
+            try {
+                RandomAccessFile raf = 
+                        new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
+                FileOperations.delete(raf, index + 1);
+                raf = new RandomAccessFile(FileOperations.COLUMNS_PATH, "rw");
+                int columnIndex = getIndexOfColumns(metadata, index);
+                for (int i = 0; i < table.getColumns().size(); i++) {
+                    FileOperations.delete(raf, columnIndex);
+                    columnIndex++;
+                }
+                metadata.remove(index);
+                raf.close();
+                Files.delete(Paths.get(
+                        FileOperations.getPathToTable(table.getTableName())));
+            }   
+            catch (IOException ex) {
+                System.out.println("IOException when dropping table.");
+            }
             System.out.println(Helper.SUCCESSFUL_QUERY);
-            System.out.println("Table " + query + " dropped.");
+            System.out.println("Table " + table.getTableName() + " dropped.");
             return true;
         }
         Error.notValidTableName();
@@ -182,5 +206,14 @@ public class DDL {
             }
         }
         return false;
+    }
+    
+    private static int getIndexOfColumns(
+            final ArrayList<TableMetaData> metaData, final int offset) {
+        int index = 1;
+        for (int i = 0; i < offset; i++) {
+            index += metaData.get(i).getColumns().size();
+        }
+        return index;
     }
 }

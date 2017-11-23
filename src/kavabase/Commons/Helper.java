@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import kavabase.DataFormat.DataType;
+import kavabase.DataFormat.SerialType;
+import kavabase.Query.Column;
 
 /**
  *
@@ -98,5 +100,24 @@ public class Helper {
     
     public static DataType getDataType(String dataType) {
         return TEXT_TO_DATATYPE_MAP.get(dataType);
+    }   
+    
+    public static boolean isColumnNumeric(Column column) {
+        return SerialType.getSerialTypeFromText(column.getDataType())
+                .isNumber();
+    }
+
+    public static boolean isColumnText(Column column) {
+        return SerialType.getSerialTypeFromText(column.getDataType()).isText();
+    }
+    
+    public static boolean validateTextInput(String input) {
+        return (input.startsWith("\"") && input.endsWith("\"")
+                || input.startsWith("\'") && input.endsWith("\'"));
+    }
+      
+    public static boolean reservedTableName(String tableName) {
+        return tableName.equals("davisbase_tables")
+                || tableName.equals("davisbase_columns");
     }
 }
