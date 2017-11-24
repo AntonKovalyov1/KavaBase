@@ -64,13 +64,15 @@ public class VDL {
                                 input,
                                 operator);
                         FileOperations.selectAll(table, comparison);
-                    } catch (NumberFormatException ex) {
+                    } 
+                    catch (NumberFormatException ex) {
                         Error.notValidInput(tokens[6]);
-                    } catch (IOException ex) {
+                    } 
+                    catch (IOException ex) {
                         System.out.println("IOException is thrown.");
                     }
                 }
-                if (Helper.isColumnText(column)) {
+                else if (Helper.isColumnText(column)) {
                     if (!Helper.validateTextInput(tokens[6])) {
                         Error.notValidInput(tokens[6]);
                         return;
@@ -82,7 +84,8 @@ public class VDL {
                             operator);
                     try {
                         FileOperations.selectAll(table, comparison);
-                    } catch (IOException ex) {
+                    } 
+                    catch (IOException ex) {
                         System.out.println("IOException is thrown.");
                     }
                 }

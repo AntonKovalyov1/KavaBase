@@ -49,4 +49,10 @@ public class Error {
     public static void notValidInput(String input) {
         System.out.println("Error: " + input + " is not a valid input.");
     }
+    
+    public static void keyUpdateNotSpecified() {
+        System.out.println("Error: when updating a key value the key to update "
+                + "must be specified with equals operator.");
+    }
+    
 }

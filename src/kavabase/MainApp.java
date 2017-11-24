@@ -1,10 +1,7 @@
 package kavabase;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import kavabase.Query.Prompt;
-import kavabase.Query.TableMetaData;
-import kavabase.fileFormat.FileOperations;
 
 /**
  *
@@ -17,8 +14,8 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-       FileOperations.createMetaData();
-          Prompt.run();
+//       FileOperations.createMetaData();
+        Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
 //        Page page = FileOperations.readPage(raf, 0);
 //        //FileOperations.getMetaData();

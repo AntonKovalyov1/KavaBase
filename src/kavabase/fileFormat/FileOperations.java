@@ -773,10 +773,12 @@ public class FileOperations {
         }
     }
     
-    private static void update(final RandomAccessFile raf, 
-                               final Comparison comparison, 
-                               final int column, 
-                               final DataType newValue) throws IOException {
+    public static int update(final TableMetaData table, 
+                             final Comparison comparison, 
+                             final int column, 
+                             final DataType newValue) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(
+                getPathToTable(table.getTableName()), "rw");
         int columnIndex = comparison.getColumnIndex();
         Operator operator = comparison.getOperator();
         Page page;
@@ -785,62 +787,99 @@ public class FileOperations {
                                  operator == Operator.GREATER_OR_EQUAL)) {
             int input = (int)((NumberComparison)comparison).getNumber();
             page = search(raf, input);
-            updateNumeric(raf, 
-                          (NumberComparison)comparison, 
-                          column, 
-                          newValue, 
-                          page);
-            return;
+            int updatedRows = updateNumeric(raf, (NumberComparison)comparison, 
+                    column, newValue, page);
+            raf.close();
+            return updatedRows;
         }
         page = getLeftmostLeafPage(raf);
         if (comparison instanceof NumberComparison) {
-            updateNumeric(raf, 
-            (NumberComparison)comparison, 
-            column, 
-            newValue, 
-            page);
+            int updatedRows = updateNumeric(raf, (NumberComparison)comparison, 
+                    column, newValue, page);
+            raf.close();
+            return updatedRows;
         }
         else if (comparison instanceof TextComparison) {
-            updateText(raf, 
-                       (TextComparison)comparison, 
-                       column, 
-                       newValue, 
-                       page);
+            int updatedRows = updateText(raf, (TextComparison)comparison, 
+                    column, newValue, page);
+            raf.close();
+            return updatedRows;
         }
+        //TODO
+        else return 0;
     }
     
-    private static void updateNumeric(final RandomAccessFile raf, 
+    public static int updateAll(final TableMetaData table,
+                                 final int column,
+                                 final DataType newValue) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(
+                getPathToTable(table.getTableName()), "rw");
+        Page page = getLeftmostLeafPage(raf);
+        int updatedValues = 0;
+        boolean done = false;
+        do {
+            for(Map.Entry<Integer, Cell> current : page.getCells().entrySet()) {
+                LeafCell cell = (LeafCell)current.getValue();
+                ArrayList<DataType> record = cell.getRecords();
+                record.set(column, newValue);
+                delete(raf, getKey(record));
+                insert(raf, record);
+                updatedValues++;
+            }
+            int rightPagePointer = page.getPagePointer();
+            if (rightPagePointer == -1)
+                done = true;
+            else
+                page = readPage(raf, rightPagePointer);
+        }
+        while(!done);
+        
+        return updatedValues;
+    }
+    
+    private static int updateNumeric(final RandomAccessFile raf, 
                                       final NumberComparison comparison, 
                                       final int column, 
                                       final DataType newValue,
                                       Page page) throws IOException {
+        System.out.println("let's go");
         int index = comparison.getColumnIndex();
         Operator operator = comparison.getOperator();
         double input = comparison.getNumber();
         Map<Integer, Cell> cells = page.getCells();
         boolean done = false;
+        int updatedValues = 0;
         do {
             for (Map.Entry<Integer, Cell> current : cells.entrySet()) {
                 LeafCell cell = (LeafCell)current.getValue();
                 ArrayList<DataType> record = cell.getRecords();
+                System.out.println("iteration " + updatedValues);
                 double value = Double.parseDouble(record.get(index).getData().
                         toString());
+                System.out.println("the value is " + value);
                 if (operator.compare(value, input)) {
-                    delete(raf, (int)record.get(0).getData());
+                    delete(raf, getKey(record));
                     record.set(column, newValue);
                     insert(raf, record);
+                    updatedValues++;
+                    //search by rowid equality
+                    if (operator == Operator.EQUAL && index == 0) {                       
+                        return updatedValues;
+                    }
                 }
             }
-            int rightPagePointer = page.getPageNumber();
+            int rightPagePointer = page.getPagePointer();
             if (rightPagePointer == -1)
                 done = true;
             else
                 page = readPage(raf, rightPagePointer);
         }
         while (!done);
+        
+        return updatedValues;
     }
     
-    private static void updateText(final RandomAccessFile raf, 
+    private static int updateText(final RandomAccessFile raf, 
                                    final TextComparison comparison, 
                                    final int column, 
                                    final DataType newValue,
@@ -849,6 +888,7 @@ public class FileOperations {
         Operator operator = comparison.getOperator();
         String input = comparison.getText();
         Map<Integer, Cell> cells = page.getCells();
+        int updatedValues = 0;
         boolean done = false;
         do {
             for (Map.Entry<Integer, Cell> current : cells.entrySet()) {
@@ -859,18 +899,35 @@ public class FileOperations {
                     delete(raf, (int)record.get(0).getData());
                     record.set(column, newValue);
                     insert(raf, record);
+                    updatedValues++;
                 }
             }
-            int rightPagePointer = page.getPageNumber();
+            int rightPagePointer = page.getPagePointer();
             if (rightPagePointer == -1)
                 done = true;
             else
                 page = readPage(raf, rightPagePointer);
         }
         while (!done);
+        return updatedValues;
     }
     
     private static int getKey(final ArrayList<DataType> row) {
         return (Integer)row.get(0).getData();
+    }
+    
+    public static boolean recordExists(TableMetaData table, int key) {
+        try {
+            String path = getPathToTable(table.getTableName());
+            RandomAccessFile raf = new RandomAccessFile(path, "rw");
+            Page page = search(raf, key);
+            if (getRecord(page, key) == null) {
+                return false;
+            }
+        }
+        catch (IOException ex) {
+            System.out.println("IOException when searching for record thrown.");
+        }
+        return true;
     }
 }

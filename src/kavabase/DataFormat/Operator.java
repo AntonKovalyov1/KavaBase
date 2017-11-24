@@ -50,6 +50,7 @@ public enum Operator {
 
         @Override
         public boolean compare(double a, double b) {
+            System.out.println("ups i messed up " + (a < b) + ", a is " + a + " and b is " + b);
             return a < b;
         }
 

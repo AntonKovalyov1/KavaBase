@@ -200,6 +200,132 @@ public class DML {
 
     public static void update(String query,
             final ArrayList<TableMetaData> metaData) {
+        String[] tokens = query.split("\\s+");
+        if (tokens.length != 5 && tokens.length != 9) {
+            Error.syntaxError();
+            return;
+        }
+        int index = metaData.indexOf(new TableMetaData(tokens[0]));
+        if (index == -1) {
+            Error.tableDoesNotExistError(tokens[0]);
+            return;
+        }
+        if (Helper.reservedTableName(tokens[0])) {
+            Error.reservedTableNameError(tokens[0]);
+            return;
+        }
+        TableMetaData table = metaData.get(index);
+        if (!tokens[1].equals("set")) {
+            Error.syntaxError();
+            return;
+        }
+        ArrayList<String> columnNames = table.getColumnNames();
+        int columnIndex = columnNames.indexOf(tokens[2]);
+        if (columnIndex == -1) {
+            Error.columnDoesNotExist(tokens[2]);
+            return;
+        }
+        Column column = table.getColumns().get(columnIndex);
+        Operator operator = Operator.parseComparison(tokens[3]);
+        if (operator != Operator.EQUAL) {
+            Error.notValidOperator(tokens[3]);
+            return;
+        }
+        if (!validateColumnInput(tokens[4], column)) {
+            Error.notValidInput(tokens[4]);
+            return;
+        }
+        DataType newValue = getDataType(tokens[4], column.getDataType());
+        if (tokens.length == 5) {
+            if (columnIndex == 0) {
+                Error.keyUpdateNotSpecified();
+                return;
+            }
+            try {
+                int updatedRows = FileOperations.updateAll(table, 
+                                                              columnIndex, 
+                                                              newValue);
+                updateSuccesful(updatedRows);
+            }
+            catch (IOException ex) {
+                System.out.println("IOException when upating table.");
+            }
+            return;
+        }
+        if (!tokens[5].equals("where")) {
+            Error.syntaxError();
+            return;
+        }
+        int comparisonIndex = columnNames.indexOf(tokens[6]);
+        if (comparisonIndex == -1) {
+            Error.columnDoesNotExist(tokens[6]);
+            return;
+        }
+        Operator comparisonOperator = Operator.parseComparison(tokens[7]);
+        System.out.println("The comparison operator is " + operator.toString());
+        if (!comparisonOperator.isValid()) {
+            Error.notValidOperator(tokens[7]);
+            return;
+        }
+        Column comparisonColumn = table.getColumns().get(comparisonIndex);
+        if (columnIndex == 0) {
+            //rowid update
+            if (comparisonIndex != 0) {
+                Error.keyUpdateNotSpecified();
+                return;
+            }
+            if (comparisonOperator != Operator.EQUAL) {
+                Error.keyUpdateNotSpecified();
+                return;
+            }
+            //check if new key value doesn't already exist
+            int key = (int)newValue.getData();
+            if (FileOperations.recordExists(table, key)) {
+                System.out.println("Record with key " + key + 
+                        " already exists.");
+                return;
+            }
+        }
+        if (Helper.isColumnNumeric(comparisonColumn)) {
+            try {
+                double input;
+                if (tokens[8].equals("null"))
+                    input = 0;
+                else
+                    input = Double.parseDouble(tokens[8]);
+                Comparison comparison = new Comparison.NumberComparison(
+                        comparisonIndex, input, comparisonOperator);
+                int updatedRows = FileOperations.update(
+                        table, comparison, columnIndex, newValue);
+                updateSuccesful(updatedRows);
+            }
+            catch (NumberFormatException ex) {
+                Error.notValidInput(tokens[8]);
+            } 
+            catch (IOException ex) {
+                System.out.println("IOException is thrown.");
+            }
+            return;
+        }
+        if (Helper.isColumnText(comparisonColumn)) {
+            if (!validateColumnInput(tokens[8], comparisonColumn)) {
+                Error.notValidInput(tokens[8]);
+                return;
+            }
+            String input = (String)getDataType(tokens[8], 
+                    comparisonColumn.getDataType()).getData();
+            Comparison comparison = new Comparison.TextComparison(
+                    comparisonIndex, input, comparisonOperator);
+            try {
+                int updatedRows = FileOperations.update(
+                        table, comparison, columnIndex, newValue);
+                updateSuccesful(updatedRows);
+            } 
+            catch (IOException ex) {
+                System.out.println("IOException is thrown.");
+            }
+            return;
+        }
         //TODO
     }
 
@@ -408,5 +534,10 @@ public class DML {
             System.out.println("IOException for insertion.");
             return false;
         }
+    }
+    
+    private static void updateSuccesful(int updatedRows) {
+        System.out.println(updatedRows + " updated rows.");
+        System.out.println("Update succesful.");
     }
 }
