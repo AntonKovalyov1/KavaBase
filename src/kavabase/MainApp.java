@@ -17,7 +17,7 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-//        FileOperations.createMetaData();
+       FileOperations.createMetaData();
           Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
 //        Page page = FileOperations.readPage(raf, 0);

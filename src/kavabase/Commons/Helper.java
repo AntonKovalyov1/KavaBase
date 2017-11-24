@@ -6,6 +6,7 @@ import java.util.Map;
 import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.SerialType;
 import kavabase.Query.Column;
+import kavabase.Query.TableMetaData;
 
 /**
  *
@@ -119,5 +120,24 @@ public class Helper {
     public static boolean reservedTableName(String tableName) {
         return tableName.equals("davisbase_tables")
                 || tableName.equals("davisbase_columns");
+    }
+    
+    public static int getNextKeyColumns(ArrayList<TableMetaData> metadata) {
+        int index = metadata.size() - 1;
+        if (index == -1)
+            return 1;
+        TableMetaData lastTable = metadata.get(index);
+        int key = lastTable.getColumnsKey() + lastTable.getColumns().size();
+        return key;
+    }
+    
+    public static int getNextKeyTables(ArrayList<TableMetaData> metaData) {
+        int index = metaData.size() - 1;
+        if (index == -1) {
+            return 1;
+        }
+        TableMetaData lastTable = metaData.get(index);
+        int key = lastTable.getTableKey() + 1;
+        return key;
     }
 }

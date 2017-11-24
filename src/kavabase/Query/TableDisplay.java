@@ -62,6 +62,7 @@ public class TableDisplay {
     }
     
     public void display() {
+        System.out.println("");
         ArrayList<Integer> columnSizes = getColumnSizes();
         StringBuilder decoration = new StringBuilder();
         for (int i = 0; i < columnSizes.size(); i++) {
@@ -78,6 +79,7 @@ public class TableDisplay {
             printRow(columnSizes, data.get(i));
         }
         System.out.println(decoration);
+        System.out.println("");
     }
     
     public void printRow(final ArrayList<Integer> columnsSizes, 

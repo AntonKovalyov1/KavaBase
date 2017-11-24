@@ -143,10 +143,11 @@ public class DML {
     public static void deleteFrom(String query,
             final ArrayList<TableMetaData> metaData) {
         String[] tokens = query.split("\\s+");
-        if (tokens.length != 5) {
+        if (tokens.length != 1 && tokens.length != 5) {
             Error.syntaxError();
             return;
         }
+        System.out.println("test");
         int index = metaData.indexOf(new TableMetaData(tokens[0]));
         if (index == -1) {
             Error.tableDoesNotExistError(tokens[0]);
@@ -155,6 +156,12 @@ public class DML {
         TableMetaData table = metaData.get(index);
         if (Helper.reservedTableName(table.getTableName())) {
             Error.reservedTableNameError(table.getTableName());
+            return;
+        }
+        if (tokens.length == 1) {
+            // delete all records from table
+            FileOperations.deleteAll(table.getTableName());
+            System.out.println("Deletion succesful.");
             return;
         }
         if (!tokens[1].equals("where")) {

@@ -11,6 +11,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.DataType.CustomText;
+import kavabase.DataFormat.DataType.Int;
 import kavabase.DataFormat.Operator;
 import kavabase.DataFormat.SerialType;
 import kavabase.Query.Column;
@@ -370,13 +371,19 @@ public class FileOperations {
             // Get table names
             RandomAccessFile raf = new RandomAccessFile(TABLES_PATH, "rw");
             ArrayList<String> tableNames = new ArrayList<>();
+            ArrayList<Integer> tableKeys = new ArrayList<>();
+            ArrayList<Integer> columnKeys = new ArrayList<>();
             Page page = getLeftmostLeafPage(raf);
             boolean done = false;
             do {
-                for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
+                for (Map.Entry<Integer, Cell> cell : 
+                        page.getCells().entrySet()) {
                     LeafCell leafCell = (LeafCell) cell.getValue();
-                    CustomText tableName = (CustomText) leafCell.getRecords().get(1);
+                    Int tableKey = (Int)leafCell.getRecords().get(0);
+                    CustomText tableName = (CustomText) 
+                            leafCell.getRecords().get(1);
                     tableNames.add(tableName.getData());
+                    tableKeys.add(tableKey.getData());
                 }
                 int nextPage = page.getPagePointer();
                 if (nextPage == -1) {
@@ -389,9 +396,9 @@ public class FileOperations {
             raf = new RandomAccessFile(COLUMNS_PATH, "r");
             page = getLeftmostLeafPage(raf);
             done = false;
-            int currentTableIndex = 0;
+            int index = 0;
             TableMetaData tableMetaData = new TableMetaData(
-                    tableNames.get(currentTableIndex));
+                    tableNames.get(index), 1, 1);
             do {
                 for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
                     LeafCell leafCell = (LeafCell) cell.getValue();
@@ -401,9 +408,12 @@ public class FileOperations {
                         tableMetaData.addColumn(createMetaDataColumn(record));
                     } 
                     else {
+                        index++;
                         metaData.add(tableMetaData);
                         tableMetaData = new TableMetaData(
-                                tableNames.get(++currentTableIndex));
+                                tableNames.get(index), 
+                                tableKeys.get(index),
+                                (int)record.get(0).getData());
                         tableMetaData.addColumn(createMetaDataColumn(record));
                     }
                 }
@@ -475,38 +485,90 @@ public class FileOperations {
         String tableName = tableMetaData.getTableName();
         String path = getPathToTable(tableName);
         RandomAccessFile raf = new RandomAccessFile(path, "r");
-        Page page = getLeftmostLeafPage(raf);
+        int columnIndex = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        
+        //Get the page
+        Page page;
+        if (columnIndex == 0 && (operator == Operator.EQUAL || 
+                                 operator == Operator.GREATER || 
+                                 operator == Operator.GREATER_OR_EQUAL)) {
+            int input = (int)((NumberComparison)comparison).getNumber();
+            page = search(raf, input);
+            selectAllNumeric(tableMetaData, 
+                             (NumberComparison)comparison, 
+                             raf, 
+                             page);
+            return;
+        }
+        page = getLeftmostLeafPage(raf);
+        
+        if (comparison instanceof NumberComparison)
+            selectAllNumeric(tableMetaData, 
+                             (NumberComparison)comparison, 
+                             raf, 
+                             page);
+        else if (comparison instanceof TextComparison)
+            selectAllText(tableMetaData, 
+                          (TextComparison)comparison, 
+                          raf, 
+                          page);
+    }
+    
+    private static void selectAllNumeric(final TableMetaData tableMetaData, 
+                                         final NumberComparison comparison, 
+                                         final RandomAccessFile raf, 
+                                         Page page) throws IOException {
         TableDisplay tableDisplay = new TableDisplay(
                 tableMetaData.getColumnNames());
-        int rightPagePointer;
+        double input = comparison.getNumber();
+        int index = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        boolean done = false;
         do {
-            for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
-                LeafCell leafCell = (LeafCell) cell.getValue();
-                ArrayList<DataType> row = leafCell.getRecords();
-                int index = comparison.getColumnIndex();
-                Operator operator = comparison.getOperator();
-                if (comparison instanceof NumberComparison) {
-                    double input = ((NumberComparison)comparison).getNumber();
-                    double value = Double.parseDouble(row.get(index)
-                            .getData().toString());
-                    if (operator.compare(value, input)) {
-                        tableDisplay.addRecord(row);
-                    }
-                }
-                else if (comparison instanceof TextComparison) {
-                    String input = ((TextComparison)comparison).getText();
-                    String value = row.get(index).getData().toString();
-                    if (operator.compare(value, input)) {
-                        tableDisplay.addRecord(row);
-                    }
-                }
+            for (Map.Entry<Integer, Cell> entry : page.getCells().entrySet()) {
+                LeafCell cell = (LeafCell)entry.getValue();
+                ArrayList<DataType> record = cell.getRecords();
+                double value = Double.parseDouble(record.get(index).getData().
+                        toString());
+                if (operator.compare(value, input))
+                    tableDisplay.addRecord(record);
             }
-            rightPagePointer = page.getPagePointer();
-            if (rightPagePointer != -1) {
+            int rightPagePointer = page.getPagePointer();
+            if (rightPagePointer == -1)
+                done = true;
+            else
                 page = readPage(raf, rightPagePointer);
+        } 
+        while (!done);
+        tableDisplay.display();
+    }
+    
+    private static void selectAllText(final TableMetaData tableMetaData, 
+                                      final TextComparison comparison, 
+                                      final RandomAccessFile raf, 
+                                      Page page) throws IOException {
+        TableDisplay tableDisplay = new TableDisplay(
+                tableMetaData.getColumnNames());
+        String input = comparison.getText();
+        int index = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        boolean done = false;
+        do {
+            for (Map.Entry<Integer, Cell> entry : page.getCells().entrySet()) {
+                LeafCell cell = (LeafCell)entry.getValue();
+                ArrayList<DataType> record = cell.getRecords();
+                String value = record.get(index).getData().toString();
+                if (operator.compare(value, input))
+                    tableDisplay.addRecord(record);
             }
-        }
-        while(rightPagePointer != -1);
+            int rightPagePointer = page.getPagePointer();
+            if (rightPagePointer == -1)
+                done = true;
+            else
+                page = readPage(raf, rightPagePointer);
+        } 
+        while (!done);
         tableDisplay.display();
     }
     
@@ -535,13 +597,11 @@ public class FileOperations {
         Page page = readPage(raf, 0);
         while (!page.isLeafPage()) {
             if (key > page.getCells().lastKey()) {
-                InteriorCell cell = (InteriorCell)
-                        page.getCells().lastEntry().getValue();
-                page = readPage(raf, cell.getLeftChildPointer());
+                page = readPage(raf, page.getPagePointer());
             }
             else {
                 InteriorCell cell = (InteriorCell)
-                        page.getCells().ceilingEntry(key);
+                        page.getCells().ceilingEntry(key).getValue();
                 page = readPage(raf, cell.getLeftChildPointer());
             }
         }
@@ -589,8 +649,10 @@ public class FileOperations {
         TreeMap<Integer, Cell> cells = page.getCells();
         int minKey = cells.firstKey();
         int maxKey = cells.lastKey();
-        SortedMap<Integer, Cell> leftCells = cells.subMap(minKey, true, splitKey, true);
-        SortedMap<Integer, Cell> rightCells = cells.subMap(splitKey, false, maxKey, true);
+        SortedMap<Integer, Cell> leftCells = cells.subMap(minKey, true, 
+                                                          splitKey, true);
+        SortedMap<Integer, Cell> rightCells = cells.subMap(splitKey, false, 
+                                                           maxKey, true);
         Page leftPage = new Page(page.getPageNumber(), 
                                  page.getPageType(), 
                                  (int)(raf.length() / Helper.PAGE_SIZE));
@@ -696,6 +758,116 @@ public class FileOperations {
         page.removeCell(key);
         writePage(raf, page);
         return true;
+    }
+    
+    public static void deleteAll(String tableName) {
+        try {
+            String tablePath = getPathToTable(tableName);
+            RandomAccessFile raf = new RandomAccessFile(tablePath, "rw");
+            raf.setLength(Helper.PAGE_SIZE);
+            writePage(raf, new Page(Helper.LEAF_TABLE_PAGE_TYPE));
+            raf.close();
+        }
+        catch (IOException ex) {
+            System.out.println("IOException is thrown when deleting table.");
+        }
+    }
+    
+    private static void update(final RandomAccessFile raf, 
+                               final Comparison comparison, 
+                               final int column, 
+                               final DataType newValue) throws IOException {
+        int columnIndex = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        Page page;
+        if (columnIndex == 0 && (operator == Operator.EQUAL || 
+                                 operator == Operator.GREATER && 
+                                 operator == Operator.GREATER_OR_EQUAL)) {
+            int input = (int)((NumberComparison)comparison).getNumber();
+            page = search(raf, input);
+            updateNumeric(raf, 
+                          (NumberComparison)comparison, 
+                          column, 
+                          newValue, 
+                          page);
+            return;
+        }
+        page = getLeftmostLeafPage(raf);
+        if (comparison instanceof NumberComparison) {
+            updateNumeric(raf, 
+            (NumberComparison)comparison, 
+            column, 
+            newValue, 
+            page);
+        }
+        else if (comparison instanceof TextComparison) {
+            updateText(raf, 
+                       (TextComparison)comparison, 
+                       column, 
+                       newValue, 
+                       page);
+        }
+    }
+    
+    private static void updateNumeric(final RandomAccessFile raf, 
+                                      final NumberComparison comparison, 
+                                      final int column, 
+                                      final DataType newValue,
+                                      Page page) throws IOException {
+        int index = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        double input = comparison.getNumber();
+        Map<Integer, Cell> cells = page.getCells();
+        boolean done = false;
+        do {
+            for (Map.Entry<Integer, Cell> current : cells.entrySet()) {
+                LeafCell cell = (LeafCell)current.getValue();
+                ArrayList<DataType> record = cell.getRecords();
+                double value = Double.parseDouble(record.get(index).getData().
+                        toString());
+                if (operator.compare(value, input)) {
+                    delete(raf, (int)record.get(0).getData());
+                    record.set(column, newValue);
+                    insert(raf, record);
+                }
+            }
+            int rightPagePointer = page.getPageNumber();
+            if (rightPagePointer == -1)
+                done = true;
+            else
+                page = readPage(raf, rightPagePointer);
+        }
+        while (!done);
+    }
+    
+    private static void updateText(final RandomAccessFile raf, 
+                                   final TextComparison comparison, 
+                                   final int column, 
+                                   final DataType newValue,
+                                   Page page) throws IOException {
+        int index = comparison.getColumnIndex();
+        Operator operator = comparison.getOperator();
+        String input = comparison.getText();
+        Map<Integer, Cell> cells = page.getCells();
+        boolean done = false;
+        do {
+            for (Map.Entry<Integer, Cell> current : cells.entrySet()) {
+                LeafCell cell = (LeafCell)current.getValue();
+                ArrayList<DataType> record = cell.getRecords();
+                String value = record.get(index).getData().toString();
+                if (operator.compare(value, input)) {
+                    delete(raf, (int)record.get(0).getData());
+                    record.set(column, newValue);
+                    insert(raf, record);
+                }
+            }
+            int rightPagePointer = page.getPageNumber();
+            if (rightPagePointer == -1)
+                done = true;
+            else
+                page = readPage(raf, rightPagePointer);
+        }
+        while (!done);
     }
     
     private static int getKey(final ArrayList<DataType> row) {

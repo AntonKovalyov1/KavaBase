@@ -38,9 +38,10 @@ public class DDL {
             try {
                 RandomAccessFile raf = 
                         new RandomAccessFile(FileOperations.TABLES_PATH, "rw");
-                FileOperations.delete(raf, index + 1);
+                FileOperations.delete(raf, table.getTableKey());
+                raf.close();
                 raf = new RandomAccessFile(FileOperations.COLUMNS_PATH, "rw");
-                int columnIndex = getIndexOfColumns(metadata, index);
+                int columnIndex = table.getColumnsKey();
                 for (int i = 0; i < table.getColumns().size(); i++) {
                     FileOperations.delete(raf, columnIndex);
                     columnIndex++;
@@ -57,7 +58,7 @@ public class DDL {
             System.out.println("Table " + table.getTableName() + " dropped.");
             return true;
         }
-        Error.notValidTableName();
+        Error.tableDoesNotExistError(query);
         return false;
     }
     
@@ -68,7 +69,9 @@ public class DDL {
             Error.notValidTableName();
             return false;
         }
-        TableMetaData table = new TableMetaData(tableName);
+        TableMetaData table = new TableMetaData(tableName, 
+                Helper.getNextKeyTables(metadata), 
+                Helper.getNextKeyColumns(metadata));
         if (metadata.contains(table)) {
             Error.tableExistsError(tableName);
             return false;
@@ -206,14 +209,5 @@ public class DDL {
             }
         }
         return false;
-    }
-    
-    private static int getIndexOfColumns(
-            final ArrayList<TableMetaData> metaData, final int offset) {
-        int index = 1;
-        for (int i = 0; i < offset; i++) {
-            index += metaData.get(i).getColumns().size();
-        }
-        return index;
     }
 }

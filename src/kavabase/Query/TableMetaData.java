@@ -11,9 +11,21 @@ public class TableMetaData {
     
     private final ArrayList<Column> columns = new ArrayList<>();
     private final String tableName;
+    private final int tableKey;
+    private final int columnsKey;
     
     public TableMetaData(final String tableName) {
         this.tableName = tableName;
+        this.tableKey = 0;
+        this.columnsKey = 0;
+    }
+    
+    public TableMetaData(final String tableName, 
+                         final int tableKey, 
+                         final int columnsKey) {
+        this.tableName = tableName;
+        this.tableKey = tableKey;
+        this.columnsKey = columnsKey;
     }
     
     public boolean addColumn(Column column) {
@@ -72,5 +84,19 @@ public class TableMetaData {
             s += column.getColumnName() + " ";
         }
         return s;
+    }
+    
+    /**
+     * @return the tableKey
+     */
+    public int getTableKey() {
+        return tableKey;
+    }
+
+    /**
+     * @return the columnsKey
+     */
+    public int getColumnsKey() {
+        return columnsKey;
     }
 }

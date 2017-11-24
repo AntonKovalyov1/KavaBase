@@ -29,7 +29,6 @@ public class VDL {
         int index = metaData.indexOf(new TableMetaData(tableName));
         if (index == -1) {
             Error.tableDoesNotExistError(tableName);
-            System.out.println(tokens[2]);
             return;
         }
         TableMetaData table = metaData.get(index);
@@ -39,24 +38,25 @@ public class VDL {
                     FileOperations.selectAll(table);
                 } catch (IOException ex) {
                     System.out.println("IOException, table not selected.");
-                }   break;
+                }
+                break;
             case 7:
                 if (!tokens[3].equals("where")) {
                     Error.syntaxError();
                     return;
-                }   ArrayList<String> columnNames = table.getColumnNames();
-                for (int i = 0; i < columnNames.size(); i++) {
-                    System.out.print(columnNames.get(i) + " ");
-                }   index = columnNames.indexOf(tokens[4]);
+                }
+                ArrayList<String> columnNames = table.getColumnNames();
+                index = columnNames.indexOf(tokens[4]);
                 if (index == -1) {
                     Error.columnDoesNotExist(tokens[4]);
                     return;
-                }   Column column = table.getColumns().get(index);
+                }
+                Column column = table.getColumns().get(index);
                 Operator operator = Operator.parseComparison(tokens[5]);
                 if (!operator.isValid()) {
                     Error.notValidOperator(tokens[5]);
                     return;
-                }   
+                }
                 if (Helper.isColumnNumeric(column)) {
                     try {
                         double input = Double.parseDouble(tokens[6]);
@@ -64,11 +64,9 @@ public class VDL {
                                 input,
                                 operator);
                         FileOperations.selectAll(table, comparison);
-                    } 
-                    catch (NumberFormatException ex) {
+                    } catch (NumberFormatException ex) {
                         Error.notValidInput(tokens[6]);
-                    } 
-                    catch (IOException ex) {
+                    } catch (IOException ex) {
                         System.out.println("IOException is thrown.");
                     }
                 }
@@ -79,13 +77,12 @@ public class VDL {
                     }
                     String input = tokens[6].
                             substring(1, tokens[6].length() - 1);
-                    Comparison comparison = new TextComparison(index, 
-                                                               input, 
-                                                               operator);
+                    Comparison comparison = new TextComparison(index,
+                            input,
+                            operator);
                     try {
                         FileOperations.selectAll(table, comparison);
-                    }
-                    catch (IOException ex) {
+                    } catch (IOException ex) {
                         System.out.println("IOException is thrown.");
                     }
                 }
