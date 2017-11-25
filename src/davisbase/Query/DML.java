@@ -197,6 +197,7 @@ public class DML {
             else {
                 System.out.println("Record does not exist.");
             }
+            raf.close();
         }
         catch (IOException ex) {
             System.out.println("IOException is thrown when deleting.");
