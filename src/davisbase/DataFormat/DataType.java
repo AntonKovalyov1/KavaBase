@@ -290,5 +290,10 @@ public abstract class DataType<T> implements Comparable<T> {
         public int compareTo(String o) {
             return this.getData().toLowerCase().compareTo(o.toLowerCase());
         }
+        
+        @Override
+        public boolean isNull() {
+            return getData().isEmpty();
+        }
     }
 }

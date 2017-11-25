@@ -23,11 +23,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(5, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return true;
         }
@@ -51,11 +46,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "NULL_2";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(5, columnName.length());
         }
 
         @Override
@@ -85,11 +75,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(5, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return true;
         }
@@ -113,11 +98,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "NULL_8";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(5, columnName.length());
         }
 
         @Override
@@ -147,11 +127,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(4, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return true;
         }
@@ -175,11 +150,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "SMALLINT";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(6, columnName.length());
         }
 
         @Override
@@ -209,11 +179,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(11, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return true;
         }
@@ -237,11 +202,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "BIGINT";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(20, columnName.length());
         }
 
         @Override
@@ -271,11 +231,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(11, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return true;
         }
@@ -299,11 +254,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "DOUBLE";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(21, columnName.length());
         }
 
         @Override
@@ -333,11 +283,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(20, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return false;
         }
@@ -361,11 +306,6 @@ public enum SerialType {
         @Override
         public String toString() {
             return "DATE";
-        }
-
-        @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(11, columnName.length());
         }
 
         @Override
@@ -395,11 +335,6 @@ public enum SerialType {
         }
 
         @Override
-        public int getDisplayOffset(String columnName) {
-            return Integer.max(30, columnName.length());
-        }
-
-        @Override
         public boolean isNumber() {
             return false;
         }
@@ -416,8 +351,6 @@ public enum SerialType {
 
     @Override
     public abstract String toString();
-
-    public abstract int getDisplayOffset(String columnName);
 
     public abstract boolean isNumber();
 
