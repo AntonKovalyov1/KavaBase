@@ -39,6 +39,10 @@ public abstract class DataType<T> implements Comparable<T> {
         return isNull ? "NULL" : getData().toString();
     }
     
+    public boolean isNull() {
+        return isNull;
+    }
+    
     public abstract byte[] toByteArray();
     
     public static class TinyInt extends DataType<Byte> {
@@ -197,8 +201,10 @@ public abstract class DataType<T> implements Comparable<T> {
         
         @Override 
         public String toString() {
+            if (isNull())
+                return "NULL";
             Date date = new Date(getData());
-            return date.toString();
+            return new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(date);
         }
         
         @Override
@@ -227,6 +233,8 @@ public abstract class DataType<T> implements Comparable<T> {
         
         @Override 
         public String toString() {
+            if (isNull())
+                return "NULL";
             Date date = new Date(getData());
             return new SimpleDateFormat("yyyy-MM-dd").format(date);
         }

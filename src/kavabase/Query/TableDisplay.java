@@ -2,7 +2,6 @@ package kavabase.Query;
 
 import java.util.ArrayList;
 import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.DataType.TinyInt;
 
 /**
  *
@@ -18,19 +17,14 @@ public class TableDisplay {
         // One column table
         columns = new ArrayList<>();
         columns.add(columnName);
-        initData();
     }
     
     public TableDisplay(final ArrayList<String> columns) {
         this.columns = columns;
-        initData();
     }   
     
     public void addRecord(final ArrayList<DataType> record) {
-        if (empty) {
-            data.remove(0);
-            empty = false;
-        }
+        empty = false;
         data.add(record);
     }
     
@@ -62,7 +56,10 @@ public class TableDisplay {
     }
     
     public void display() {
-        System.out.println("");
+        if (empty) {
+            System.out.println("Empty set.");
+            return;
+        }
         ArrayList<Integer> columnSizes = getColumnSizes();
         StringBuilder decoration = new StringBuilder();
         for (int i = 0; i < columnSizes.size(); i++) {
@@ -79,7 +76,6 @@ public class TableDisplay {
             printRow(columnSizes, data.get(i));
         }
         System.out.println(decoration);
-        System.out.println("");
     }
     
     public void printRow(final ArrayList<Integer> columnsSizes, 
@@ -103,13 +99,5 @@ public class TableDisplay {
         }
         System.out.print("|");
         System.out.println("");
-    }
-
-    private void initData() {
-        ArrayList<DataType> emptyRow = new ArrayList<>();
-        columns.forEach((item) -> {
-            emptyRow.add(new TinyInt());
-        });
-        data.add(emptyRow);
     }
 }

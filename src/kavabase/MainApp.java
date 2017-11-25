@@ -1,8 +1,10 @@
 package kavabase;
 
 import java.io.IOException;
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.Operator;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import kavabase.Query.Prompt;
 
 /**
@@ -16,6 +18,18 @@ public class MainApp {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
+//        String s = "2001-11-11_08:08:08";
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+//        try {
+//            long l = dateFormat.parse(s).getTime();
+//            Date date = new Date(l);
+//            System.out.println(dateFormat.format(date));
+//        }
+//        catch (ParseException ex) {
+//            System.out.println("ups");
+//        }
+//        Date d = new Date(System.currentTimeMillis());
+//        System.out.println(d.toString());
 //       FileOperations.createMetaData();
         Prompt.run();
 //        RandomAccessFile raf = new RandomAccessFile(FileOperations.TABLES_PATH, "rw");

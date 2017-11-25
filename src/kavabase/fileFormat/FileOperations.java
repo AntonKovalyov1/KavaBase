@@ -398,7 +398,8 @@ public class FileOperations {
             TableMetaData tableMetaData = new TableMetaData(
                     tableNames.get(index), 1, 1);
             do {
-                for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) {
+                for (Map.Entry<Integer, Cell> cell : page.getCells().entrySet()) 
+                {
                     LeafCell leafCell = (LeafCell) cell.getValue();
                     ArrayList<DataType> record = leafCell.getRecords();
                     if (tableMetaData.getTableName().equals(
@@ -476,6 +477,7 @@ public class FileOperations {
         }
         while(rightPagePointer != -1);
         tableDisplay.display();
+        raf.close();
     }
     
     public static void selectAll(final TableMetaData tableMetaData, 
@@ -496,6 +498,7 @@ public class FileOperations {
         else
             page = getLeftmostLeafPage(raf);
         selectAll(tableMetaData, comparison, raf, page);
+        raf.close();
     }
     
     private static void selectAll(final TableMetaData tableMetaData, 

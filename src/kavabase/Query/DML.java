@@ -2,7 +2,11 @@ package kavabase.Query;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.DataType.BigInt;
@@ -14,6 +18,8 @@ import kavabase.DataFormat.DataType.SmallInt;
 import kavabase.DataFormat.DataType.TinyInt;
 import kavabase.fileFormat.FileOperations;
 import kavabase.Commons.Helper;
+import kavabase.DataFormat.DataType.CustomDate;
+import kavabase.DataFormat.DataType.CustomDateTime;
 import kavabase.DataFormat.Operator;
 
 /**
@@ -407,16 +413,46 @@ public class DML {
     }
 
     private static boolean validateDateTimeInput(String input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        if (!validateTextInput(input))
+            return false;
+        input = input.substring(1, input.length() - 1);
+        try {
+            df.parse(input);
+        }
+        catch (ParseException ex) {
+            System.out.println("Expected a date of format YYYY-MM-DD_HH:mm:ss"
+                    + " instead of " + input);
+            return false;
+        }
+        return true;
     }
 
     private static boolean validateDateInput(String input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        if (!validateTextInput(input))
+            return false;
+        input = input.substring(1, input.length() - 1);
+        try {
+            df.parse(input);
+        }
+        catch (ParseException ex) {
+            System.out.println("Expected a date of format YYYY-MM-DD instead "
+                    + "of " + input);
+            return false;
+        }
+        return true;
     }
 
     private static boolean validateTextInput(String input) {
-        return (input.startsWith("\"") && input.endsWith("\"")
-                || input.startsWith("\'") && input.endsWith("\'"));
+        if (!(input.startsWith("\"") && input.endsWith("\"")
+                || input.startsWith("\'") && input.endsWith("\'"))) {
+            System.out.println("Expected a text input that starts with \' or "
+                    + "\" and ends with \' or \" respectively, instead of " 
+                    + input);
+            return false;
+        }
+        return true;
     }
 
     public static DataType getDataType(String input, String column) {
@@ -483,11 +519,35 @@ public class DML {
     }
 
     private static DataType getDateTime(String input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        input = input.toLowerCase();
+        if (input.equals("null"))
+            return new DataType.CustomDate();
+        input = input.substring(1, input.length() - 1);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        try {
+            Date date = df.parse(input);
+            return new CustomDateTime(date.getTime());
+        }
+        catch (ParseException ex) {
+            System.out.println("Date parsing exception.");
+        }
+        return new CustomDateTime(new Date().getTime());
     }
 
     private static DataType getDate(String input) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        input = input.toLowerCase();
+        if (input.equals("null"))
+            return new DataType.CustomDate();
+        input = input.substring(1, input.length() - 1);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = df.parse(input);
+            return new CustomDate(date.getTime());
+        }
+        catch (ParseException ex) {
+            System.out.println("Date parsing exception.");
+        }
+        return new CustomDate(new Date().getTime());
     }
 
     private static CustomText getText(String input) {
