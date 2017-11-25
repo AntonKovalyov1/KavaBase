@@ -17,7 +17,6 @@ public class Prompt {
             }
             String[] query = input.replaceAll(System.lineSeparator(), " ")
                                   .replaceAll(" +", " ")
-                                  .toLowerCase()
                                   .split(";");
             for (String currentQuery : query) {
                 queryExecutor.execute(currentQuery.trim());

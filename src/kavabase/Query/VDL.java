@@ -3,9 +3,8 @@ package kavabase.Query;
 import java.io.IOException;
 import java.util.ArrayList;
 import kavabase.Commons.Helper;
+import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.Operator;
-import kavabase.Query.Comparison.NumberComparison;
-import kavabase.Query.Comparison.TextComparison;
 import kavabase.fileFormat.FileOperations;
 
 /**
@@ -21,7 +20,8 @@ public class VDL {
             Error.syntaxError();
             return;
         }
-        if (!"*".equals(tokens[0]) || !"from".equals(tokens[1])) {
+        if (!"*".equals(tokens[0].toLowerCase()) || 
+            !"from".equals(tokens[1].toLowerCase())) {
             Error.syntaxError();
             return;
         }
@@ -41,12 +41,12 @@ public class VDL {
                 }
                 break;
             case 7:
-                if (!tokens[3].equals("where")) {
+                if (!tokens[3].toLowerCase().equals("where")) {
                     Error.syntaxError();
                     return;
                 }
                 ArrayList<String> columnNames = table.getColumnNames();
-                index = columnNames.indexOf(tokens[4]);
+                index = columnNames.indexOf(tokens[4].toLowerCase());
                 if (index == -1) {
                     Error.columnDoesNotExist(tokens[4]);
                     return;
@@ -57,37 +57,20 @@ public class VDL {
                     Error.notValidOperator(tokens[5]);
                     return;
                 }
-                if (Helper.isColumnNumeric(column)) {
-                    try {
-                        double input = Double.parseDouble(tokens[6]);
-                        Comparison comparison = new NumberComparison(index,
-                                input,
-                                operator);
-                        FileOperations.selectAll(table, comparison);
-                    } 
-                    catch (NumberFormatException ex) {
-                        Error.notValidInput(tokens[6]);
-                    } 
-                    catch (IOException ex) {
-                        System.out.println("IOException is thrown.");
-                    }
+                if (!DML.validateColumnInput(tokens[6], column)) {
+                    Error.notValidInput(tokens[6]);
+                    return;
                 }
-                else if (Helper.isColumnText(column)) {
-                    if (!Helper.validateTextInput(tokens[6])) {
-                        Error.notValidInput(tokens[6]);
-                        return;
-                    }
-                    String input = tokens[6].
-                            substring(1, tokens[6].length() - 1);
-                    Comparison comparison = new TextComparison(index,
-                            input,
-                            operator);
-                    try {
-                        FileOperations.selectAll(table, comparison);
-                    } 
-                    catch (IOException ex) {
-                        System.out.println("IOException is thrown.");
-                    }
+                DataType input = DML.getDataType(tokens[6], 
+                        column.getDataType());
+                Comparison comparison = new Comparison(index,
+                        input,
+                        operator);
+                try {
+                    FileOperations.selectAll(table, comparison);
+                } 
+                catch (IOException ex) {
+                    System.out.println("IOException is thrown.");
                 }
                 break;
             default:

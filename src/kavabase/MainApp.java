@@ -1,6 +1,8 @@
 package kavabase;
 
 import java.io.IOException;
+import kavabase.DataFormat.DataType;
+import kavabase.DataFormat.Operator;
 import kavabase.Query.Prompt;
 
 /**

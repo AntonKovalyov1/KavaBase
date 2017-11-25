@@ -63,8 +63,10 @@ public class Column {
             return false;
         }
         Column other = (Column) o;
-        return this.tableName.equals(other.getTableName()) &&
-               this.columnName.equals(other.getColumnName());
+        return this.tableName.toLowerCase().equals(
+                       other.getTableName().toLowerCase()) &&
+               this.columnName.toLowerCase().equals(
+                       other.getColumnName().toLowerCase());
     }
 
     @Override

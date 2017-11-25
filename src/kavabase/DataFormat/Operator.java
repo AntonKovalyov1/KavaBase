@@ -23,13 +23,8 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            return a == b;
-        }
-        
-        @Override
-        public boolean compare(String s1, String s2) {
-            return s1.equals(s2);
+        public boolean compare(DataType a, DataType b) {
+            return a.compareTo(a.getClass().cast(b).getData()) == 0;
         }
     },
     LESS {
@@ -49,14 +44,8 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            System.out.println("ups i messed up " + (a < b) + ", a is " + a + " and b is " + b);
-            return a < b;
-        }
-
-        @Override
-        public boolean compare(String s1, String s2) {
-            return s1.compareTo(s2) < 0;
+        public boolean compare(DataType a, DataType b) {
+            return a.compareTo(a.getClass().cast(b).getData()) == -1;
         }
     },
     LESS_OR_EQUAL {
@@ -76,13 +65,8 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            return a <= b;
-        }
-
-        @Override
-        public boolean compare(String s1, String s2) {
-            return s1.compareTo(s2) <= 0;
+        public boolean compare(DataType a, DataType b) {
+            return a.compareTo(a.getClass().cast(b).getData()) <= 0;
         }
     },
     GREATER {
@@ -102,13 +86,8 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            return a > b;
-        }
-
-        @Override
-        public boolean compare(String s1, String s2) {
-            return s1.compareTo(s2) > 0;
+        public boolean compare(DataType a, DataType b) {
+            return a.compareTo(a.getClass().cast(b).getData()) > 0;
         }
     },
     GREATER_OR_EQUAL {
@@ -128,13 +107,8 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            return a >= b;
-        }
-
-        @Override
-        public boolean compare(String s1, String s2) {
-            return s1.compareTo(s2) >= 0;
+        public boolean compare(DataType a, DataType b) {
+            return a.compareTo(a.getClass().cast(b).getData()) >= 0;
         }
     },
     NOT_VALID {
@@ -154,20 +128,14 @@ public enum Operator {
         }
 
         @Override
-        public boolean compare(double a, double b) {
-            throw new UnsupportedOperationException("Not a valid operator.");
-        }
-
-        @Override
-        public boolean compare(String s1, String s2) {
+        public boolean compare(DataType a, DataType b) {
             throw new UnsupportedOperationException("Not a valid operator.");
         }
     };
     
     public abstract byte getCode();
     public abstract boolean isValid();
-    public abstract boolean compare(double a, double b);
-    public abstract boolean compare(String s1, String s2);
+    public abstract boolean compare(DataType a, DataType b);
     
     @Override
     public abstract String toString();

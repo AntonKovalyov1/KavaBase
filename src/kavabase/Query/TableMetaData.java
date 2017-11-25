@@ -47,7 +47,7 @@ public class TableMetaData {
     public ArrayList<String> getColumnNames() {
         ArrayList<String> columnNames = new ArrayList<>();
         for (Column column : columns) {
-            columnNames.add(column.getColumnName());
+            columnNames.add(column.getColumnName().toLowerCase());
         }
         return columnNames;
     }
@@ -66,7 +66,8 @@ public class TableMetaData {
         if (!(o instanceof TableMetaData))
             return false;
         TableMetaData other = (TableMetaData)o;
-        return this.getTableName().equals(other.getTableName());
+        return this.getTableName().toLowerCase().equals(
+                other.getTableName().toLowerCase());
     }
 
     @Override

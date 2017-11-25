@@ -10,7 +10,7 @@ import java.util.Date;
  * @author Anton
  * @param <T>
  */
-public abstract class DataType<T> {
+public abstract class DataType<T> implements Comparable<T> {
     
     private final T data;
     private final SerialType serialType;
@@ -58,6 +58,11 @@ public abstract class DataType<T> {
                              .put(getData())
                              .array();
         }
+
+        @Override
+        public int compareTo(Byte o) {
+            return this.getData().compareTo(o);
+        }
     }
     
     public static class SmallInt extends DataType<Short> {
@@ -76,6 +81,11 @@ public abstract class DataType<T> {
                              .order(ByteOrder.BIG_ENDIAN)
                              .putShort(getData())
                              .array();
+        }
+
+        @Override
+        public int compareTo(Short o) {
+            return this.getData().compareTo(o);
         }
     }
     
@@ -96,6 +106,11 @@ public abstract class DataType<T> {
                              .putInt(getData())
                              .array();
         }        
+
+        @Override
+        public int compareTo(Integer o) {
+            return this.getData().compareTo(o);
+        }
     }
     
     public static class BigInt extends DataType<Long> {
@@ -114,6 +129,11 @@ public abstract class DataType<T> {
                              .order(ByteOrder.BIG_ENDIAN)
                              .putLong(getData())
                              .array();
+        }
+
+        @Override
+        public int compareTo(Long o) {
+            return this.getData().compareTo(o);
         }
     }
     
@@ -134,6 +154,11 @@ public abstract class DataType<T> {
                              .putFloat(getData())
                              .array();
         }
+
+        @Override
+        public int compareTo(Float o) {
+            return this.getData().compareTo(o);
+        }
     }
     
     public static class CustomDouble extends DataType<Double> {
@@ -152,6 +177,11 @@ public abstract class DataType<T> {
                              .order(ByteOrder.BIG_ENDIAN)
                              .putDouble(getData())
                              .array();
+        }
+
+        @Override
+        public int compareTo(Double o) {
+            return this.getData().compareTo(o);
         }
     }
     
@@ -178,6 +208,11 @@ public abstract class DataType<T> {
                              .putLong(getData())
                              .array();
         }
+
+        @Override
+        public int compareTo(Long o) {
+            return this.getData().compareTo(o);
+        }
     }
     
     public static class CustomDate extends DataType<Long> {
@@ -202,6 +237,11 @@ public abstract class DataType<T> {
                              .order(ByteOrder.BIG_ENDIAN)
                              .putLong(getData())
                              .array();
+        }
+
+        @Override
+        public int compareTo(Long o) {
+            return this.getData().compareTo(o);
         }
     }
     
@@ -236,6 +276,11 @@ public abstract class DataType<T> {
         @Override
         public String toString() {
             return getData().isEmpty() ? "NULL" : getData();
+        }
+
+        @Override
+        public int compareTo(String o) {
+            return this.getData().toLowerCase().compareTo(o.toLowerCase());
         }
     }
 }

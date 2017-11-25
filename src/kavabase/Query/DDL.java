@@ -28,7 +28,7 @@ public class DDL {
     
     public static boolean dropTable(String query, 
             final ArrayList<TableMetaData> metadata) {
-        int index = metadata.indexOf(new TableMetaData(query));
+        int index = metadata.indexOf(new TableMetaData(query.toLowerCase()));
         if (index != -1) {
             TableMetaData table = metadata.get(index);
             if (Helper.reservedTableName(table.getTableName())) {
@@ -169,9 +169,9 @@ public class DDL {
         if (tokens.length != 4)
             return false;
         if (Helper.isNameValid(tokens[0]) && 
-               tokens[1].equals("int") &&
-               tokens[2].equals("primary") &&
-               tokens[3].equals("key")) {
+               tokens[1].toLowerCase().equals("int") &&
+               tokens[2].toLowerCase().equals("primary") &&
+               tokens[3].toLowerCase().equals("key")) {
             Column column = new Column(table.getTableName(), 
                                        tokens[0], 
                                        "INT", 
@@ -188,8 +188,8 @@ public class DDL {
         if (tokens.length == 4)
             if (Helper.isNameValid(tokens[0]) && 
                 Helper.isDataType(tokens[1]) &&
-                tokens[2].equals("not") &&
-                tokens[3].equals("null")) {
+                tokens[2].toLowerCase().equals("not") &&
+                tokens[3].toLowerCase().equals("null")) {
                 Column c = new Column(table.getTableName(),
                                       tokens[0], 
                                       tokens[1].toUpperCase(), 

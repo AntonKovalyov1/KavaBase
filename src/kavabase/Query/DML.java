@@ -36,7 +36,7 @@ public class DML {
         }
         query = query.substring(tableName.length()).trim();
         TableMetaData table = metaData.get(index);
-        if (query.startsWith("values")) {
+        if (query.toLowerCase().startsWith("values")) {
             query = query.substring("values".length()).trim();
             if (query.length() < 3
                     || !query.startsWith("(") && !query.endsWith(")")) {
@@ -103,7 +103,7 @@ public class DML {
         }
         ArrayList<String> columnNames = table.getColumnNames();
         for (int i = 0; i < columnTokens.length; i++) {
-            if (!columnNames.contains(columnTokens[i])) {
+            if (!columnNames.contains(columnTokens[i].toLowerCase())) {
                 Error.columnDoesNotExist(columnTokens[i]);
                 return false;
             }
@@ -147,7 +147,6 @@ public class DML {
             Error.syntaxError();
             return;
         }
-        System.out.println("test");
         int index = metaData.indexOf(new TableMetaData(tokens[0]));
         if (index == -1) {
             Error.tableDoesNotExistError(tokens[0]);
@@ -164,7 +163,7 @@ public class DML {
             System.out.println("Deletion succesful.");
             return;
         }
-        if (!tokens[1].equals("where")) {
+        if (!tokens[1].toLowerCase().equals("where")) {
             Error.syntaxError();
             return;
         }
@@ -215,12 +214,12 @@ public class DML {
             return;
         }
         TableMetaData table = metaData.get(index);
-        if (!tokens[1].equals("set")) {
+        if (!tokens[1].toLowerCase().equals("set")) {
             Error.syntaxError();
             return;
         }
         ArrayList<String> columnNames = table.getColumnNames();
-        int columnIndex = columnNames.indexOf(tokens[2]);
+        int columnIndex = columnNames.indexOf(tokens[2].toLowerCase());
         if (columnIndex == -1) {
             Error.columnDoesNotExist(tokens[2]);
             return;
@@ -252,11 +251,11 @@ public class DML {
             }
             return;
         }
-        if (!tokens[5].equals("where")) {
+        if (!tokens[5].toLowerCase().equals("where")) {
             Error.syntaxError();
             return;
         }
-        int comparisonIndex = columnNames.indexOf(tokens[6]);
+        int comparisonIndex = columnNames.indexOf(tokens[6].toLowerCase());
         if (comparisonIndex == -1) {
             Error.columnDoesNotExist(tokens[6]);
             return;
@@ -286,52 +285,26 @@ public class DML {
                 return;
             }
         }
-        if (Helper.isColumnNumeric(comparisonColumn)) {
-            try {
-                double input;
-                if (tokens[8].equals("null"))
-                    input = 0;
-                else
-                    input = Double.parseDouble(tokens[8]);
-                Comparison comparison = new Comparison.NumberComparison(
-                        comparisonIndex, input, comparisonOperator);
-                int updatedRows = FileOperations.update(
-                        table, comparison, columnIndex, newValue);
-                updateSuccesful(updatedRows);
-            }
-            catch (NumberFormatException ex) {
-                Error.notValidInput(tokens[8]);
-            } 
-            catch (IOException ex) {
-                System.out.println("IOException is thrown.");
-            }
+        if (!validateColumnInput(tokens[8], comparisonColumn)) {
+            Error.notValidInput(tokens[8]);
             return;
         }
-        if (Helper.isColumnText(comparisonColumn)) {
-            if (!validateColumnInput(tokens[8], comparisonColumn)) {
-                Error.notValidInput(tokens[8]);
-                return;
-            }
-            String input = (String)getDataType(tokens[8], 
-                    comparisonColumn.getDataType()).getData();
-            Comparison comparison = new Comparison.TextComparison(
-                    comparisonIndex, input, comparisonOperator);
-            try {
-                int updatedRows = FileOperations.update(
-                        table, comparison, columnIndex, newValue);
-                updateSuccesful(updatedRows);
-            } 
-            catch (IOException ex) {
-                System.out.println("IOException is thrown.");
-            }
-            return;
+        DataType input = getDataType(tokens[8], comparisonColumn.getDataType());
+        Comparison comparison = new Comparison(comparisonIndex, input, 
+                comparisonOperator);
+        try {
+            int updatedRows = FileOperations.update(
+                    table, comparison, columnIndex, newValue);
+            updateSuccesful(updatedRows);
+        } 
+        catch (IOException ex) {
+            System.out.println("IOException is thrown.");
         }
-        //TODO
     }
 
     public static boolean validateColumnInput(String input, Column column) {
         // check for null
-        if (input.equals("null")) {
+        if (input.toLowerCase().equals("null")) {
             if (column.isNullable().equals("YES")) {
                 return true;
             }
@@ -480,32 +453,32 @@ public class DML {
     }
 
     private static TinyInt getTinyInt(String input) {
-        return input.equals("null")
+        return input.toLowerCase().equals("null")
                 ? new TinyInt() : new TinyInt(Byte.parseByte(input));
     }
 
     private static SmallInt getSmallInt(String input) {
-        return input.equals("null")
+        return input.toLowerCase().equals("null")
                 ? new SmallInt() : new SmallInt(Short.parseShort(input));
     }
 
     private static Int getInt(String input) {
-        return input.equals("null")
+        return input.toLowerCase().equals("null")
                 ? new Int() : new Int(Integer.parseInt(input));
     }
 
     private static BigInt getBigInt(String input) {
-        return input.equals("null")
+        return input.toLowerCase().equals("null")
                 ? new BigInt() : new BigInt(Long.parseLong(input));
     }
 
     private static Real getReal(String input) {
-        return input.equals("null")
+        return input.toLowerCase().equals("null")
                 ? new Real() : new Real(Float.parseFloat(input));
     }
 
     private static CustomDouble getCustomDouble(String input) {
-        return input.equals("null") ? new CustomDouble()
+        return input.toLowerCase().equals("null") ? new CustomDouble()
                 : new CustomDouble(Double.parseDouble(input));
     }
 
@@ -518,7 +491,7 @@ public class DML {
     }
 
     private static CustomText getText(String input) {
-        return input.equals("null") ? new CustomText()
+        return input.toLowerCase().equals("null") ? new CustomText()
                 : new CustomText(input.substring(1, input.length() - 1));
     }
 

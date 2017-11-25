@@ -49,35 +49,35 @@ public class QueryExecutor {
     }
     
     private boolean isShowTablesCommand(String query) {
-        return query.equals(Command.SHOW_TABLES);
+        return query.toLowerCase().equals(Command.SHOW_TABLES);
     }
     
     private boolean isCreateTableCommand(String query) {
-        return query.startsWith(Command.CREATE_TABLE);
+        return query.toLowerCase().startsWith(Command.CREATE_TABLE);
     }
     
     private boolean isDropTableCommand(String query) {
-        return query.startsWith(Command.DROP_TABLE);
+        return query.toLowerCase().startsWith(Command.DROP_TABLE);
     }
     
     private boolean isInsertIntoCommand(String query) {
-        return query.startsWith(Command.INSERT_INTO);
+        return query.toLowerCase().startsWith(Command.INSERT_INTO);
     }
     
     private boolean isDeleteFromCommand(String query) {
-        return query.startsWith(Command.DELETE_FROM);
+        return query.toLowerCase().startsWith(Command.DELETE_FROM);
     }
     
     private boolean isUpdateCommand(String query) {
-        return query.startsWith(Command.UPDATE);
+        return query.toLowerCase().startsWith(Command.UPDATE);
     }
     
     private boolean isSelectCommand(String query) {
-        return query.startsWith(Command.SELECT);
+        return query.toLowerCase().startsWith(Command.SELECT);
     }
     
     private boolean isExitCommand(String query) {
-        return query.equals(Command.EXIT);
+        return query.toLowerCase().equals(Command.EXIT);
     }
 
     private ArrayList<TableMetaData> initMetadata() {

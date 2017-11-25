@@ -1,18 +1,23 @@
 package kavabase.Query;
 
+import kavabase.DataFormat.DataType;
 import kavabase.DataFormat.Operator;
 
 /**
  *
  * @author Anton
  */
-public abstract class Comparison {
+public class Comparison {
     
     private final int columnIndex;
+    private final DataType input;
     private final Operator operator;
     
-    public Comparison(final int columnIndex, final Operator operator) {
+    public Comparison(final int columnIndex, 
+                      final DataType input, 
+                      final Operator operator) {
         this.columnIndex = columnIndex;
+        this.input = input;
         this.operator = operator;
     }
 
@@ -29,37 +34,11 @@ public abstract class Comparison {
     public Operator getOperator() {
         return operator;
     }
-    
-    public static class NumberComparison extends Comparison {
 
-        private final double number;
-        
-        public NumberComparison(final int columnIndex, 
-                                final double number, 
-                                final Operator operator) {
-            super(columnIndex, operator);
-            this.number = number;
-        }
-
-        public double getNumber() {
-            return number;
-        }
+    /**
+     * @return the input
+     */
+    public DataType getInput() {
+        return input;
     }
-    
-    public static class TextComparison extends Comparison {
-
-        private final String text;
-        
-        public TextComparison(final int columnIndex, 
-                                final String text, 
-                                final Operator operator) {
-            super(columnIndex, operator);
-            this.text = text;
-        }
-
-        public String getText() {
-            return text;
-        }
-    }
-    
 }

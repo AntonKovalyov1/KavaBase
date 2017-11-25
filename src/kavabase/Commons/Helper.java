@@ -47,7 +47,7 @@ public class Helper {
     }
     
     public static boolean isReservedWord(String s) {
-        return RESERVED_WORDS.contains(s);
+        return RESERVED_WORDS.contains(s.toLowerCase());
     }
     
         
@@ -102,15 +102,6 @@ public class Helper {
     public static DataType getDataType(String dataType) {
         return TEXT_TO_DATATYPE_MAP.get(dataType);
     }   
-    
-    public static boolean isColumnNumeric(Column column) {
-        return SerialType.getSerialTypeFromText(column.getDataType())
-                .isNumber();
-    }
-
-    public static boolean isColumnText(Column column) {
-        return SerialType.getSerialTypeFromText(column.getDataType()).isText();
-    }
     
     public static boolean validateTextInput(String input) {
         return (input.startsWith("\"") && input.endsWith("\"")
