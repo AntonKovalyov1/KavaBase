@@ -98,6 +98,10 @@ public class VDL {
             Error.notValidInput(tokens[6]);
             return;
         }
+        if (tokens[6].toLowerCase().equals("null")) {
+            Error.notValidOperator(operator.toString() + " " + tokens[6]);
+            return;
+        }
         DataType input = DML.getDataType(tokens[6], column.getDataType());
         Comparison comparison = new Comparison(index, input, operator);
         try {

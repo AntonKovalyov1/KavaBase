@@ -206,7 +206,7 @@ public class DML {
     public static void update(String query,
             final ArrayList<TableMetaData> metaData) {
         String[] tokens = query.split("\\s+");
-        if (tokens.length != 5 && tokens.length != 9) {
+        if (tokens.length != 5 && tokens.length != 9 && tokens.length != 10) {
             Error.syntaxError();
             return;
         }
@@ -266,10 +266,52 @@ public class DML {
             Error.columnDoesNotExist(tokens[6]);
             return;
         }
+        // special check for is not null operator
+        if (tokens.length == 10) {
+            if (!(tokens[7].toLowerCase().equals("is") && 
+                  tokens[8].toLowerCase().equals("not") && 
+                  tokens[9].toLowerCase().equals("null"))) {
+                Error.notValidOperator(tokens[7] + " " + tokens[8] + " " + 
+                        tokens[9]);
+                return;
+                }
+            Comparison comparison = new Comparison(comparisonIndex, 
+                    new TinyInt(), Operator.IS_NOT_NULL);
+            try {
+                int updatedRows = FileOperations.update(table, comparison, 
+                        columnIndex, newValue);
+                updateSuccesful(updatedRows);
+            } 
+            catch (IOException ex) {
+                System.out.println("IOException is thrown when updating.");
+            }
+            return;
+        }
+        // special check for is null operator
+        if (tokens[7].toLowerCase().equals("is")) {
+            if (!tokens[8].toLowerCase().equals("null")) {
+                Error.notValidOperator("is " + tokens[8]);
+                return;
+            }
+            Comparison comparison = new Comparison(comparisonIndex, 
+                    new TinyInt(), Operator.IS_NULL);
+            try {
+                int updatedRows = FileOperations.update(
+                        table, comparison, columnIndex, newValue);
+                updateSuccesful(updatedRows);
+            } 
+            catch (IOException ex) {
+                System.out.println("IOException is thrown when updating.");
+            }
+            return;
+        }
         Operator comparisonOperator = Operator.parseComparison(tokens[7]);
-        System.out.println("The comparison operator is " + operator.toString());
         if (!comparisonOperator.isValid()) {
             Error.notValidOperator(tokens[7]);
+            return;
+        }
+        if (tokens[8].toLowerCase().equals("null")) {
+            Error.notValidOperator(operator.toString() + " " + tokens[8]);
             return;
         }
         Column comparisonColumn = table.getColumns().get(comparisonIndex);
@@ -304,7 +346,7 @@ public class DML {
             updateSuccesful(updatedRows);
         } 
         catch (IOException ex) {
-            System.out.println("IOException is thrown.");
+            System.out.println("IOException is thrown when updating.");
         }
     }
 

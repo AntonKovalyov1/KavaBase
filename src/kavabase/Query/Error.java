@@ -51,8 +51,7 @@ public class Error {
     }
     
     public static void keyUpdateNotSpecified() {
-        System.out.println("Error: when updating a key value the key to update "
-                + "must be specified with equals operator.");
+        System.out.println("Error: when updating a key value the key to be "
+                + "updated must be specified with an equals operator.");
     }
-    
 }
