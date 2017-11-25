@@ -1,4 +1,4 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.util.Scanner;
 
@@ -10,7 +10,7 @@ public class Prompt {
         QueryExecutor queryExecutor = new QueryExecutor();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("kavasql> ");
+            System.out.print(PROMPT);
             String input = scanner.next();
             while (!input.endsWith(";")) {
                 input = input + " " + scanner.next();

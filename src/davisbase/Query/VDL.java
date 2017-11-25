@@ -1,11 +1,11 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.DataType.TinyInt;
-import kavabase.DataFormat.Operator;
-import kavabase.fileFormat.FileOperations;
+import davisbase.DataFormat.DataType;
+import davisbase.DataFormat.DataType.TinyInt;
+import davisbase.DataFormat.Operator;
+import davisbase.fileFormat.FileOperations;
 
 /**
  *

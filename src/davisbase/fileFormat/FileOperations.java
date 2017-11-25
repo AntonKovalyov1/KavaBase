@@ -1,6 +1,6 @@
-package kavabase.fileFormat;
+package davisbase.fileFormat;
 
-import kavabase.Commons.Helper;
+import davisbase.Commons.Helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,17 +9,17 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.Stack;
 import java.util.TreeMap;
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.DataType.CustomText;
-import kavabase.DataFormat.DataType.Int;
-import kavabase.DataFormat.Operator;
-import kavabase.DataFormat.SerialType;
-import kavabase.Query.Column;
-import kavabase.Query.Comparison;
-import kavabase.Query.TableDisplay;
-import kavabase.Query.TableMetaData;
-import kavabase.fileFormat.Cell.LeafCell;
-import kavabase.fileFormat.Cell.InteriorCell;
+import davisbase.DataFormat.DataType;
+import davisbase.DataFormat.DataType.CustomText;
+import davisbase.DataFormat.DataType.Int;
+import davisbase.DataFormat.Operator;
+import davisbase.DataFormat.SerialType;
+import davisbase.Query.Column;
+import davisbase.Query.Comparison;
+import davisbase.Query.TableDisplay;
+import davisbase.Query.TableMetaData;
+import davisbase.fileFormat.Cell.LeafCell;
+import davisbase.fileFormat.Cell.InteriorCell;
 
 /**
  *
@@ -73,7 +73,8 @@ public class FileOperations {
         try {
             createTablesFile();
             createColumnsFile();
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -180,7 +181,6 @@ public class FileOperations {
         columns6.add(new DataType.CustomText("NO"));
         LeafCell columns6LeafCell = new LeafCell(columns6);
 
-        //Create page header
         int pagePointer = -1;
 
         //Create page
@@ -200,7 +200,6 @@ public class FileOperations {
         columnsPage.addCells(cellsMap);
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         raf.setLength(Helper.PAGE_SIZE);
-        raf.seek(0);
         writePage(raf, columnsPage);
         raf.close();
     }
@@ -424,7 +423,8 @@ public class FileOperations {
                 else {
                     page = readPage(raf, nextPage);
                 }
-            } while (!done);
+            } 
+            while (!done);
             raf.close();
         } 
         catch (IOException ex) {

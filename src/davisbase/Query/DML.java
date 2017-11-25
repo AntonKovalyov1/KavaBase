@@ -1,4 +1,4 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -8,19 +8,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.DataType.BigInt;
-import kavabase.DataFormat.DataType.CustomDouble;
-import kavabase.DataFormat.DataType.CustomText;
-import kavabase.DataFormat.DataType.Int;
-import kavabase.DataFormat.DataType.Real;
-import kavabase.DataFormat.DataType.SmallInt;
-import kavabase.DataFormat.DataType.TinyInt;
-import kavabase.fileFormat.FileOperations;
-import kavabase.Commons.Helper;
-import kavabase.DataFormat.DataType.CustomDate;
-import kavabase.DataFormat.DataType.CustomDateTime;
-import kavabase.DataFormat.Operator;
+import davisbase.DataFormat.DataType;
+import davisbase.DataFormat.DataType.BigInt;
+import davisbase.DataFormat.DataType.CustomDouble;
+import davisbase.DataFormat.DataType.CustomText;
+import davisbase.DataFormat.DataType.Int;
+import davisbase.DataFormat.DataType.Real;
+import davisbase.DataFormat.DataType.SmallInt;
+import davisbase.DataFormat.DataType.TinyInt;
+import davisbase.fileFormat.FileOperations;
+import davisbase.Commons.Helper;
+import davisbase.DataFormat.DataType.CustomDate;
+import davisbase.DataFormat.DataType.CustomDateTime;
+import davisbase.DataFormat.Operator;
 
 /**
  *

@@ -1,4 +1,4 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.util.Objects;
 

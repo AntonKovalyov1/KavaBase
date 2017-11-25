@@ -1,7 +1,7 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.util.ArrayList;
-import kavabase.DataFormat.DataType;
+import davisbase.DataFormat.DataType;
 
 /**
  *

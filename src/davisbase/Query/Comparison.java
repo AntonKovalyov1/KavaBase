@@ -1,7 +1,7 @@
-package kavabase.Query;
+package davisbase.Query;
 
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.Operator;
+import davisbase.DataFormat.DataType;
+import davisbase.DataFormat.Operator;
 
 /**
  *

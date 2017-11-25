@@ -1,12 +1,10 @@
-package kavabase.Commons;
+package davisbase.Commons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import kavabase.DataFormat.DataType;
-import kavabase.DataFormat.SerialType;
-import kavabase.Query.Column;
-import kavabase.Query.TableMetaData;
+import davisbase.DataFormat.DataType;
+import davisbase.Query.TableMetaData;
 
 /**
  *
@@ -102,11 +100,6 @@ public class Helper {
     public static DataType getDataType(String dataType) {
         return TEXT_TO_DATATYPE_MAP.get(dataType);
     }   
-    
-    public static boolean validateTextInput(String input) {
-        return (input.startsWith("\"") && input.endsWith("\"")
-                || input.startsWith("\'") && input.endsWith("\'"));
-    }
       
     public static boolean reservedTableName(String tableName) {
         return tableName.equals("davisbase_tables")

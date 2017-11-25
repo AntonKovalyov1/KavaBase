@@ -1,7 +1,7 @@
-package kavabase.Query;
+package davisbase.Query;
 
 import java.util.ArrayList;
-import kavabase.fileFormat.FileOperations;
+import davisbase.fileFormat.FileOperations;
 
 /**
  *
@@ -89,7 +89,7 @@ public class QueryExecutor {
     }
 
     /**
-     * @return the metadata
+     * @return the metaData
      */
     public ArrayList<TableMetaData> getMetaData() {
         return metaData;
